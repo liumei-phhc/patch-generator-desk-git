@@ -49,7 +49,7 @@ public class GUIConsoleAppender extends AbstractAppender {
         if (MainFrameConsoleUtil.getConsole() != null) {
             MainFrameConsoleUtil.println(new String(bytes));
         } else {
-            System.out.print("console控制台初始化失败！");
+            LOGGER.error("console控制台初始化失败！");
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }

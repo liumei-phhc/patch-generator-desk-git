@@ -7,10 +7,25 @@
     <packaging>jar</packaging>
     <repositories>
         <repository>
+            <id>emsite-repos</id>
+            <name>emsite Repository</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+        </repository>
+        <repository>  
+            <id>central</id>  
+            <name>Central Repository</name>  
+            <url>http://repo.maven.apache.org/maven2</url>  
+            <layout>default</layout>  
+            <snapshots>  
+                <enabled>false</enabled>  
+            </snapshots>  
+        </repository>  
+        <repository>
             <id>unknown-jars-temp-repo</id>
             <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
             <url>file:${project.basedir}/lib</url>
         </repository>
+        
     </repositories>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,6 +35,14 @@
         <junit.version>4.11</junit.version>
     </properties>
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.dom4j/dom4j -->
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>2.1.0</version>
+            <type>jar</type>
+        </dependency>
+
         <!-- common jar -->
         <dependency>
             <groupId>commons-logging</groupId>
@@ -48,7 +71,7 @@
             <artifactId>log4j-core</artifactId>
         </dependency>
 
-         <dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
@@ -78,7 +101,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>com.empire</groupId>
             <artifactId>patch-generator</artifactId>
             <version>${patch-generator.version}</version>
@@ -92,6 +115,11 @@
             <groupId>unknown.binary</groupId>
             <artifactId>AbsoluteLayout</artifactId>
             <version>SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.swinglabs</groupId>
+            <artifactId>swing-layout</artifactId>
+            <version>1.0.3</version>
         </dependency>
     </dependencies>
     <dependencyManagement>
@@ -109,7 +137,9 @@
 
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>

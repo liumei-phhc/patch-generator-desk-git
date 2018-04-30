@@ -6,6 +6,7 @@
 package com.empire.patch.generator.desk;
 
 import com.empire.patch.generator.GeneratePatchExecutor;
+import com.empire.patch.generator.desk.utils.DOMUtils;
 import com.empire.patch.generator.entity.PatchInfo;
 import com.empire.patch.generator.entity.ProjectInfo;
 import com.empire.patch.generator.entity.SourceMapper;
@@ -19,16 +20,30 @@ import com.empire.patch.generator.entity.ProjectReviseMapper;
 import java.awt.Dimension;
 import java.util.List;
 import java.awt.Toolkit;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 桌面增量打包神器主代码
- * @author Aaron  
+ *
+ * @author Aaron
  */
 public class GeneratorMainJFrame extends javax.swing.JFrame {
 
@@ -79,6 +94,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         GITSERVERVERSIONENDjTextField = new javax.swing.JTextField();
         GITSERVERVERSIONSTARTjTextField = new javax.swing.JTextField();
         GITSERVERVERSIONCENTERjLabel = new javax.swing.JLabel();
+        GITSERVERPROJECTCONFIGjButton = new javax.swing.JButton();
         SVNSERVERjScrollPane = new javax.swing.JScrollPane();
         SVNSERVERjPanel = new javax.swing.JPanel();
         SVNSERVERPROJECTNAMEjLabel = new javax.swing.JLabel();
@@ -111,7 +127,8 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         SVNSERVERREVISEjTextField = new javax.swing.JTextField();
         SVNSERVERACOUNTjTextField = new javax.swing.JTextField();
         SVNSERVERREVISEPATHjLabel = new javax.swing.JLabel();
-        SVNSERVEREXCLUDEjTextField1 = new javax.swing.JTextField();
+        SVNSERVEREXCLUDEjTextField = new javax.swing.JTextField();
+        SVNSERVERPROJECTCONFIGjButton = new javax.swing.JButton();
         GITLOGjScrollPane = new javax.swing.JScrollPane();
         GITLOGjPanel = new javax.swing.JPanel();
         GITLOGPROJECTNAMEjLabel = new javax.swing.JLabel();
@@ -134,6 +151,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         GITLOGDELjButton = new javax.swing.JButton();
         GITLOGSAVECONFIGjButton = new javax.swing.JButton();
         GITLOGOUTPACKjButton = new javax.swing.JButton();
+        GITLOGPROJECTCONFIGjButton = new javax.swing.JButton();
         SVNLOGjScrollPane = new javax.swing.JScrollPane();
         SVNLOGjPanel = new javax.swing.JPanel();
         SVNLOGPATHjLabel = new javax.swing.JLabel();
@@ -156,19 +174,21 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         SVNLOGPROJECTTYPEjLabel = new javax.swing.JLabel();
         SVNLOGPROJECTMUTILjRadioButton = new javax.swing.JRadioButton();
         SVNLOGSAVECONFIGjButton = new javax.swing.JButton();
+        SVNLOGPROJECTCONFIGjButton = new javax.swing.JButton();
         CONSOLEtextArea = new java.awt.TextArea();
         CONSOLEjLabel = new javax.swing.JLabel();
         globalConsolejScrollPane = new javax.swing.JScrollPane();
         globalConsolejTextPane = new javax.swing.JTextPane();
         globalConsoleClearjButton = new javax.swing.JButton();
+        PROJECTADDRESSjLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Empire全自动打包神器v2.0_Creat By Aaron【Q群456742016】");
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setIconImage(Toolkit.getDefaultToolkit().getImage("reportTask.png"));
         setLocation(new java.awt.Point(0, 0));
         setName("mainframe"); // NOI18N
         setSize(new java.awt.Dimension(300, 200));
-        setType(java.awt.Window.Type.POPUP);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         GITSERVERjScrollPane.setPreferredSize(new java.awt.Dimension(0, 0));
@@ -315,6 +335,14 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         GITSERVERVERSIONCENTERjLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         GITSERVERjPanel.add(GITSERVERVERSIONCENTERjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 20, 20));
 
+        GITSERVERPROJECTCONFIGjButton.setText("配置");
+        GITSERVERPROJECTCONFIGjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GITSERVERPROJECTCONFIGjButtonActionPerformed(evt);
+            }
+        });
+        GITSERVERjPanel.add(GITSERVERPROJECTCONFIGjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, -1, 20));
+
         GITSERVERjScrollPane.setViewportView(GITSERVERjPanel);
 
         PatchjTabbedPane.addTab("GIT服务器增量", GITSERVERjScrollPane);
@@ -415,7 +443,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         });
         SVNSERVERTABELjScrollPane.setViewportView(SVNSERVERSOURCEMAPPERjTable);
 
-        SVNSERVERjPanel.add(SVNSERVERTABELjScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 530, 110));
+        SVNSERVERjPanel.add(SVNSERVERTABELjScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 230, 530, 110));
 
         SVNSERVERADDjButton.setText("新增");
         SVNSERVERADDjButton.addActionListener(new java.awt.event.ActionListener() {
@@ -423,7 +451,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                 SVNSERVERADDjButtonActionPerformed(evt);
             }
         });
-        SVNSERVERjPanel.add(SVNSERVERADDjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 240, -1, 20));
+        SVNSERVERjPanel.add(SVNSERVERADDjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 230, -1, 20));
 
         SVNSERVERDELjButton.setText("删除");
         SVNSERVERDELjButton.addActionListener(new java.awt.event.ActionListener() {
@@ -431,7 +459,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                 SVNSERVERDELjButtonActionPerformed(evt);
             }
         });
-        SVNSERVERjPanel.add(SVNSERVERDELjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 270, -1, 20));
+        SVNSERVERjPanel.add(SVNSERVERDELjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 260, -1, 20));
 
         SVNSERVERSAVECONFIGjButton.setText("保存");
         SVNSERVERSAVECONFIGjButton.addActionListener(new java.awt.event.ActionListener() {
@@ -439,7 +467,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                 SVNSERVERSAVECONFIGjButtonActionPerformed(evt);
             }
         });
-        SVNSERVERjPanel.add(SVNSERVERSAVECONFIGjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 300, -1, 20));
+        SVNSERVERjPanel.add(SVNSERVERSAVECONFIGjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 290, -1, 20));
 
         SVNSERVEROUTPACKjButton.setText("打包");
         SVNSERVEROUTPACKjButton.addActionListener(new java.awt.event.ActionListener() {
@@ -447,7 +475,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                 SVNSERVEROUTPACKjButtonActionPerformed(evt);
             }
         });
-        SVNSERVERjPanel.add(SVNSERVEROUTPACKjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 330, -1, 20));
+        SVNSERVERjPanel.add(SVNSERVEROUTPACKjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 320, -1, 20));
 
         SVNSERVEREXCLUDEjLabel.setText("排除版本");
         SVNSERVERjPanel.add(SVNSERVEREXCLUDEjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 170, -1, 20));
@@ -477,8 +505,16 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         SVNSERVERREVISEPATHjLabel.setText("修正路径");
         SVNSERVERjPanel.add(SVNSERVERREVISEPATHjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 140, -1, 20));
 
-        SVNSERVEREXCLUDEjTextField1.setFont(new java.awt.Font("幼圆", 0, 10)); // NOI18N
-        SVNSERVERjPanel.add(SVNSERVEREXCLUDEjTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 170, 140, 20));
+        SVNSERVEREXCLUDEjTextField.setFont(new java.awt.Font("幼圆", 0, 10)); // NOI18N
+        SVNSERVERjPanel.add(SVNSERVEREXCLUDEjTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 170, 140, 20));
+
+        SVNSERVERPROJECTCONFIGjButton.setText("配置");
+        SVNSERVERPROJECTCONFIGjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SVNSERVERPROJECTCONFIGjButtonActionPerformed(evt);
+            }
+        });
+        SVNSERVERjPanel.add(SVNSERVERPROJECTCONFIGjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, -1, 20));
 
         SVNSERVERjScrollPane.setViewportView(SVNSERVERjPanel);
 
@@ -614,6 +650,14 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         });
         GITLOGjPanel.add(GITLOGOUTPACKjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 260, -1, 20));
 
+        GITLOGPROJECTCONFIGjButton.setText("配置");
+        GITLOGPROJECTCONFIGjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GITLOGPROJECTCONFIGjButtonActionPerformed(evt);
+            }
+        });
+        GITLOGjPanel.add(GITLOGPROJECTCONFIGjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, -1, 20));
+
         GITLOGjScrollPane.setViewportView(GITLOGjPanel);
 
         PatchjTabbedPane.addTab("GIT日志增量", GITLOGjScrollPane);
@@ -747,6 +791,14 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         });
         SVNLOGjPanel.add(SVNLOGSAVECONFIGjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 230, -1, 20));
 
+        SVNLOGPROJECTCONFIGjButton.setText("配置");
+        SVNLOGPROJECTCONFIGjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SVNLOGPROJECTCONFIGjButtonActionPerformed(evt);
+            }
+        });
+        SVNLOGjPanel.add(SVNLOGPROJECTCONFIGjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, -1, 20));
+
         SVNLOGjScrollPane.setViewportView(SVNLOGjPanel);
 
         PatchjTabbedPane.addTab("SVN日志增量", null, SVNLOGjScrollPane, "");
@@ -780,53 +832,62 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         });
         getContentPane().add(globalConsoleClearjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 390, 60, 20));
 
+        PROJECTADDRESSjLabel.setFont(new java.awt.Font("宋体", 0, 10)); // NOI18N
+        PROJECTADDRESSjLabel.setText("gitee地址：https://gitee.com/hackempire/patch-generator-desk");
+        PROJECTADDRESSjLabel.setAutoscrolls(true);
+        PROJECTADDRESSjLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        getContentPane().add(PROJECTADDRESSjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 390, 470, 20));
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
     /**
      * SVN日志增量映射表删除一行
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNLOGDELjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGDELjButtonActionPerformed
         ((DefaultTableModel) SVNLOGSOURCEMAPPERjTable.getModel()).removeRow(SVNLOGSOURCEMAPPERjTable.getSelectedRow());
     }//GEN-LAST:event_SVNLOGDELjButtonActionPerformed
     /**
      * SVN日志增量映射表增加一行
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNLOGADDjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGADDjButtonActionPerformed
         ((DefaultTableModel) SVNLOGSOURCEMAPPERjTable.getModel()).addRow(new String[]{"", "", ""});
     }//GEN-LAST:event_SVNLOGADDjButtonActionPerformed
     /**
      * SVN日志增量点击打包
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNLOGOUTPACKjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGOUTPACKjButtonActionPerformed
         String projectName = SVNLOGPROJECTNAMEjTextField.getText();
         String projectPath = SVNLOGPROJECTPATHjTextField.getText();
         String logPath = SVNLOGPATHjTextField.getText();
         String outputPath = SVNLOGOUTPUTjTextField.getText();
-        
+
         List<SourceMapper> sourceMappers = new ArrayList<>();
-        DefaultTableModel  sourceMapperModel=(DefaultTableModel)SVNLOGSOURCEMAPPERjTable.getModel();
-        int rowCount=sourceMapperModel.getRowCount();
-        for(int i=0; i<rowCount; i++) {
-            String sourceDir=sourceMapperModel.getValueAt(i, 0)!=null?sourceMapperModel.getValueAt(i, 0).toString():"";
-            String targetDir=sourceMapperModel.getValueAt(i, 1)!=null?sourceMapperModel.getValueAt(i, 1).toString():"";
-            String patchDir=sourceMapperModel.getValueAt(i, 2)!=null?sourceMapperModel.getValueAt(i, 2).toString():"";
-            if(StringUtils.isNotBlank(sourceDir)&&StringUtils.isNotBlank(targetDir)){
-                SourceMapper sourceMapper=new SourceMapper(sourceDir,targetDir,patchDir);
+        DefaultTableModel sourceMapperModel = (DefaultTableModel) SVNLOGSOURCEMAPPERjTable.getModel();
+        int rowCount = sourceMapperModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            String sourceDir = sourceMapperModel.getValueAt(i, 0) != null ? sourceMapperModel.getValueAt(i, 0).toString() : "";
+            String targetDir = sourceMapperModel.getValueAt(i, 1) != null ? sourceMapperModel.getValueAt(i, 1).toString() : "";
+            String patchDir = sourceMapperModel.getValueAt(i, 2) != null ? sourceMapperModel.getValueAt(i, 2).toString() : "";
+            if (StringUtils.isNotBlank(sourceDir) && StringUtils.isNotBlank(targetDir)) {
+                SourceMapper sourceMapper = new SourceMapper(sourceDir, targetDir, patchDir);
                 sourceMappers.add(sourceMapper);
             }
         }
-       ProjectTypeEnum projectType=ProjectTypeEnum.SINGLEMODULE;
-       if(SVNLOGPROJECTMUTILjRadioButton.isSelected()){
-         projectType=ProjectTypeEnum.MULTIMODULE;
-       }
+        ProjectTypeEnum projectType = ProjectTypeEnum.SINGLEMODULE;
+        if (SVNLOGPROJECTMUTILjRadioButton.isSelected()) {
+            projectType = ProjectTypeEnum.MULTIMODULE;
+        }
         SvnProjectInfo projectInfo = new SvnProjectInfo();
         projectInfo.setProjectName(projectName);
         projectInfo.setProjectType(projectType);
-        if(!projectPath.endsWith("/")){
-         projectPath=projectPath+"/";
+        if (!projectPath.endsWith("/")) {
+            projectPath = projectPath + "/";
         }
         projectInfo.setTargetBaseDir(projectPath);
         projectInfo.setVersionManagerTypeEnum(VersionManagerTypeEnum.SVN);
@@ -836,56 +897,32 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         patchInfo.setPatchFileDir(outputPath);
         patchInfo.setPatchFile(logPath);
         GeneratePatchExecutor.execute((ProjectInfo) projectInfo, patchInfo);
-        MainFrameConsoleUtil.println("打包完成");
+        LOGGER.info("打包完成");
     }//GEN-LAST:event_SVNLOGOUTPACKjButtonActionPerformed
     /**
      * SVN日志增量-增量包输出目录选择
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNLOGOUTPUTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGOUTPUTjButtonActionPerformed
         //设置只能选择目录
-        globaljFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);//只能选择目录
-        int i = globaljFileChooser.showOpenDialog(null);
-        if (i == JFileChooser.APPROVE_OPTION) { //打开文件
-            String path = globaljFileChooser.getSelectedFile().getAbsolutePath();
-            String name = globaljFileChooser.getSelectedFile().getName();
-            MainFrameConsoleUtil.println("当前文件路径：" + path + ";\n当前文件名：" + name);
-            SVNLOGOUTPUTjTextField.setText(path);
-        } else {
-            MainFrameConsoleUtil.println("没有选中文件");
-        }
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNLOGOUTPUTjTextField, null, null);
     }//GEN-LAST:event_SVNLOGOUTPUTjButtonActionPerformed
     /**
      * SVN日志增量-服务器项目URL路径选择
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNLOGPATHjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGPATHjButtonActionPerformed
-        globaljFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);//只能选择目录
-        int i = globaljFileChooser.showOpenDialog(null);
-        if (i == JFileChooser.APPROVE_OPTION) { //打开文件
-            String path = globaljFileChooser.getSelectedFile().getAbsolutePath();
-            String name = globaljFileChooser.getSelectedFile().getName();
-            MainFrameConsoleUtil.println("当前文件路径：" + path + ";\n当前文件名：" + name);
-            SVNLOGPATHjTextField.setText(path);
-        } else {
-            MainFrameConsoleUtil.println("没有选中文件");
-        }
+        doJfileChooseAction(JFileChooser.FILES_ONLY, SVNLOGPATHjTextField, null, null);
     }//GEN-LAST:event_SVNLOGPATHjButtonActionPerformed
     /**
      * SVN日志增量项目本地路径选择
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNLOGPROJECTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGPROJECTjButtonActionPerformed
-        globaljFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);//只能选择目录
-        int i = globaljFileChooser.showOpenDialog(null);
-        if (i == JFileChooser.APPROVE_OPTION) { //打开文件
-            String path = globaljFileChooser.getSelectedFile().getAbsolutePath();
-            String name = globaljFileChooser.getSelectedFile().getName();
-            MainFrameConsoleUtil.println("当前文件路径：" + path + ";\n当前文件名：" + name);
-            SVNLOGPROJECTPATHjTextField.setText(path);
-        } else {
-            MainFrameConsoleUtil.println("没有选中文件");
-        }
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNLOGPROJECTPATHjTextField, null, null);
     }//GEN-LAST:event_SVNLOGPROJECTjButtonActionPerformed
 
     private void SVNLOGSOURCEMAPPERjTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SVNLOGSOURCEMAPPERjTableMouseClicked
@@ -897,117 +934,253 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_SVNLOGSOURCEMAPPERjTableMouseClicked
     /**
      * SVN日志增量配置保存
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNLOGSAVECONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGSAVECONFIGjButtonActionPerformed
         // TODO add your handling code here:
+        String projectName = SVNLOGPROJECTNAMEjTextField.getText();
+        String projectPath = SVNLOGPROJECTPATHjTextField.getText();
+        String logPath = SVNLOGPATHjTextField.getText();
+        String outputPath = SVNLOGOUTPUTjTextField.getText();
+
+        List<SourceMapper> sourceMappers = new ArrayList<>();
+        DefaultTableModel sourceMapperModel = (DefaultTableModel) SVNLOGSOURCEMAPPERjTable.getModel();
+        int rowCount = sourceMapperModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            String sourceDir = sourceMapperModel.getValueAt(i, 0) != null ? sourceMapperModel.getValueAt(i, 0).toString() : "";
+            String targetDir = sourceMapperModel.getValueAt(i, 1) != null ? sourceMapperModel.getValueAt(i, 1).toString() : "";
+            String patchDir = sourceMapperModel.getValueAt(i, 2) != null ? sourceMapperModel.getValueAt(i, 2).toString() : "";
+            if (StringUtils.isNotBlank(sourceDir) && StringUtils.isNotBlank(targetDir)) {
+                SourceMapper sourceMapper = new SourceMapper(sourceDir, targetDir, patchDir);
+                sourceMappers.add(sourceMapper);
+            }
+        }
+        ProjectTypeEnum projectType = ProjectTypeEnum.SINGLEMODULE;
+        if (SVNLOGPROJECTMUTILjRadioButton.isSelected()) {
+            projectType = ProjectTypeEnum.MULTIMODULE;
+        }
+        svnLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+
+        if (svnLogProjectConfig != null) {
+            try {
+                //DocumentHelper提供了创建Document对象的方法 
+                Document document = DocumentHelper.createDocument();
+                //添加节点信息 
+                Element rootElement = document.addElement("patch-config");
+                //这里可以继续添加子节点，也可以指定内容 
+                //rootElement.setText("这个是module标签的文本信息");
+                Element projectNameElement = rootElement.addElement("project-name");
+                projectNameElement.setText(projectName);
+                Element projectPathElement = rootElement.addElement("project-path");
+                projectPathElement.setText(projectPath);
+                Element logPathElement = rootElement.addElement("log-path");
+                logPathElement.setText(logPath);
+                Element outputPathElement = rootElement.addElement("output-path");
+                outputPathElement.setText(outputPath);
+                Element projectTypeElement = rootElement.addElement("project-type");
+                projectTypeElement.setText(projectType.name());
+                Element genTypeTypeElement = rootElement.addElement("gen-type");
+                genTypeTypeElement.setText(GenTypeEnum.LOG.name());
+                Element versionManagerTypeElement = rootElement.addElement("version-manager-type");
+                versionManagerTypeElement.setText(VersionManagerTypeEnum.SVN.name());
+                if (sourceMappers.size() > 0) {
+                    Element sourceMappersElement = rootElement.addElement("source-mappers");
+                    for (SourceMapper sourceMapper : sourceMappers) {
+                        Element sourceMapperElement = sourceMappersElement.addElement("source-mapper");
+                        Element sourceDirElement = sourceMapperElement.addElement("source-dir");
+                        sourceDirElement.setText(sourceMapper.getSourceDir());
+                        Element targetDirElement = sourceMapperElement.addElement("target-dir");
+                        targetDirElement.setText(sourceMapper.getTargetDir());
+                        Element patchDirElement = sourceMapperElement.addElement("patch-dir");
+                        patchDirElement.setText(sourceMapper.getPatchDir());
+                    }
+                }
+                Writer fileWriter = new FileWriter(svnLogProjectConfig);
+                //设置文件编码  
+                OutputFormat xmlFormat = new OutputFormat();
+                xmlFormat.setEncoding("UTF-8");
+                // 设置换行 
+                xmlFormat.setNewlines(true);
+                // 生成缩进 
+                xmlFormat.setIndent(true);
+                // 使用4个空格进行缩进, 可以兼容文本编辑器 
+                xmlFormat.setIndent("    ");
+                //dom4j提供了专门写入文件的对象XMLWriter 
+                XMLWriter xmlWriter = new XMLWriter(fileWriter, xmlFormat);
+                xmlWriter.write(document);
+                xmlWriter.flush();
+                xmlWriter.close();
+                LOGGER.info("SVN日志增量保存配置文件保存成功！路径：{}", svnLogProjectConfig);
+            } catch (IOException e) {
+                LOGGER.error("SVN日志增量保存配置文件异常", e);
+            }
+        }
+
     }//GEN-LAST:event_SVNLOGSAVECONFIGjButtonActionPerformed
     /**
      * GIT日志增量项目本地路径选择
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITLOGPROJECTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGPROJECTjButtonActionPerformed
         // TODO add your handling code here:
-        globaljFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);//只能选择目录
-        int i = globaljFileChooser.showOpenDialog(null);
-        if (i == JFileChooser.APPROVE_OPTION) { //打开文件
-            String path = globaljFileChooser.getSelectedFile().getAbsolutePath();
-            String name = globaljFileChooser.getSelectedFile().getName();
-            MainFrameConsoleUtil.println("当前文件路径：" + path + ";\n当前文件名：" + name);
-            GITLOGPROJECTPATHjTextField.setText(path);
-        } else {
-            MainFrameConsoleUtil.println("没有选中文件");
-        }
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITLOGPROJECTPATHjTextField, null, null);
     }//GEN-LAST:event_GITLOGPROJECTjButtonActionPerformed
     /**
      * GIT日志增量-本地记录的日志文件
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITLOGPATHjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGPATHjButtonActionPerformed
         // 设置智能选择文件
-        globaljFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);//
-        int i = globaljFileChooser.showOpenDialog(null);
-        if (i == JFileChooser.APPROVE_OPTION) { //打开文件
-            String path = globaljFileChooser.getSelectedFile().getAbsolutePath();
-            String name = globaljFileChooser.getSelectedFile().getName();
-            MainFrameConsoleUtil.println("当前文件路径：" + path + ";\n当前文件名：" + name);
-            GITLOGPATHjTextField.setText(path);
-        } else {
-            MainFrameConsoleUtil.println("没有选中文件");
-        }
+        doJfileChooseAction(JFileChooser.FILES_ONLY, GITLOGPATHjTextField, null, "txt");
     }//GEN-LAST:event_GITLOGPATHjButtonActionPerformed
     /**
      * GIT日志增量-增量包输出目录选择
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITLOGOUTPUTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGOUTPUTjButtonActionPerformed
-         globaljFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);//只能选择目录
-        int i = globaljFileChooser.showOpenDialog(null);
-        if (i == JFileChooser.APPROVE_OPTION) { //打开文件
-            String path = globaljFileChooser.getSelectedFile().getAbsolutePath();
-            String name = globaljFileChooser.getSelectedFile().getName();
-            MainFrameConsoleUtil.println("当前文件路径：" + path + ";\n当前文件名：" + name);
-            GITLOGOUTPUTjTextField.setText(path);
-        } else {
-            MainFrameConsoleUtil.println("没有选中文件");
-        }
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITLOGOUTPUTjTextField, null, null);
     }//GEN-LAST:event_GITLOGOUTPUTjButtonActionPerformed
     private void GITLOGSOURCEMAPPERjTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GITLOGSOURCEMAPPERjTableMouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_GITLOGSOURCEMAPPERjTableMouseClicked
     /**
      * GIT日志增量-映射表添加一行
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITLOGADDjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGADDjButtonActionPerformed
         ((DefaultTableModel) GITLOGSOURCEMAPPERjTable.getModel()).addRow(new String[]{"", "", ""});
     }//GEN-LAST:event_GITLOGADDjButtonActionPerformed
     /**
      * GIT日志增量-映射表删除一行
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITLOGDELjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGDELjButtonActionPerformed
         // TODO add your handling code here:
-         ((DefaultTableModel) GITLOGSOURCEMAPPERjTable.getModel()).removeRow(GITLOGSOURCEMAPPERjTable.getSelectedRow());
+        ((DefaultTableModel) GITLOGSOURCEMAPPERjTable.getModel()).removeRow(GITLOGSOURCEMAPPERjTable.getSelectedRow());
     }//GEN-LAST:event_GITLOGDELjButtonActionPerformed
     /**
      * GIT日志增量-保存配置
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITLOGSAVECONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGSAVECONFIGjButtonActionPerformed
         // TODO add your handling code here:
+        String projectName = GITLOGPROJECTNAMEjTextField.getText();
+        String projectPath = GITLOGPROJECTPATHjTextField.getText();
+        String logPath = GITLOGPATHjTextField.getText();
+        String outputPath = GITLOGOUTPUTjTextField.getText();
+
+        List<SourceMapper> sourceMappers = new ArrayList<>();
+        DefaultTableModel sourceMapperModel = (DefaultTableModel) GITLOGSOURCEMAPPERjTable.getModel();
+        int rowCount = sourceMapperModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            String sourceDir = sourceMapperModel.getValueAt(i, 0) != null ? sourceMapperModel.getValueAt(i, 0).toString() : "";
+            String targetDir = sourceMapperModel.getValueAt(i, 1) != null ? sourceMapperModel.getValueAt(i, 1).toString() : "";
+            String patchDir = sourceMapperModel.getValueAt(i, 2) != null ? sourceMapperModel.getValueAt(i, 2).toString() : "";
+            if (StringUtils.isNotBlank(sourceDir) && StringUtils.isNotBlank(targetDir)) {
+                SourceMapper sourceMapper = new SourceMapper(sourceDir, targetDir, patchDir);
+                sourceMappers.add(sourceMapper);
+            }
+        }
+        ProjectTypeEnum projectType = ProjectTypeEnum.SINGLEMODULE;
+        if (GITLOGPROJECTMUTILjRadioButton.isSelected()) {
+            projectType = ProjectTypeEnum.MULTIMODULE;
+        }
+        gitLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+
+        if (gitLogProjectConfig != null) {
+            try {
+                //DocumentHelper提供了创建Document对象的方法 
+                Document document = DocumentHelper.createDocument();
+                //添加节点信息 
+                Element rootElement = document.addElement("patch-config");
+                //这里可以继续添加子节点，也可以指定内容 
+                //rootElement.setText("这个是module标签的文本信息");
+                Element projectNameElement = rootElement.addElement("project-name");
+                projectNameElement.setText(projectName);
+                Element projectPathElement = rootElement.addElement("project-path");
+                projectPathElement.setText(projectPath);
+                Element logPathElement = rootElement.addElement("log-path");
+                logPathElement.setText(logPath);
+                Element outputPathElement = rootElement.addElement("output-path");
+                outputPathElement.setText(outputPath);
+                Element projectTypeElement = rootElement.addElement("project-type");
+                projectTypeElement.setText(projectType.name());
+                Element genTypeTypeElement = rootElement.addElement("gen-type");
+                genTypeTypeElement.setText(GenTypeEnum.LOG.name());
+                Element versionManagerTypeElement = rootElement.addElement("version-manager-type");
+                versionManagerTypeElement.setText(VersionManagerTypeEnum.GIT.name());
+                if (sourceMappers.size() > 0) {
+                    Element sourceMappersElement = rootElement.addElement("source-mappers");
+                    for (SourceMapper sourceMapper : sourceMappers) {
+                        Element sourceMapperElement = sourceMappersElement.addElement("source-mapper");
+                        Element sourceDirElement = sourceMapperElement.addElement("source-dir");
+                        sourceDirElement.setText(sourceMapper.getSourceDir());
+                        Element targetDirElement = sourceMapperElement.addElement("target-dir");
+                        targetDirElement.setText(sourceMapper.getTargetDir());
+                        Element patchDirElement = sourceMapperElement.addElement("patch-dir");
+                        patchDirElement.setText(sourceMapper.getPatchDir());
+                    }
+                }
+                Writer fileWriter = new FileWriter(gitLogProjectConfig);
+                //设置文件编码  
+                OutputFormat xmlFormat = new OutputFormat();
+                xmlFormat.setEncoding("UTF-8");
+                // 设置换行 
+                xmlFormat.setNewlines(true);
+                // 生成缩进 
+                xmlFormat.setIndent(true);
+                // 使用4个空格进行缩进, 可以兼容文本编辑器 
+                xmlFormat.setIndent("    ");
+                //dom4j提供了专门写入文件的对象XMLWriter 
+                XMLWriter xmlWriter = new XMLWriter(fileWriter, xmlFormat);
+                xmlWriter.write(document);
+                xmlWriter.flush();
+                xmlWriter.close();
+                LOGGER.info("GIT日志增量保存配置文件保存成功！路径：{}", gitLogProjectConfig);
+            } catch (IOException e) {
+                LOGGER.error("GIT日志增量保存配置文件异常", e);
+            }
+        }
     }//GEN-LAST:event_GITLOGSAVECONFIGjButtonActionPerformed
     /**
      * GIt日志增量-点击打增量包
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITLOGOUTPACKjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGOUTPACKjButtonActionPerformed
         String projectName = GITLOGPROJECTNAMEjTextField.getText();
         String projectPath = GITLOGPROJECTPATHjTextField.getText();
         String logPath = GITLOGPATHjTextField.getText();
         String outputPath = GITLOGOUTPUTjTextField.getText();
-        
+
         List<SourceMapper> sourceMappers = new ArrayList<>();
-        DefaultTableModel  sourceMapperModel=(DefaultTableModel)GITLOGSOURCEMAPPERjTable.getModel();
-        int rowCount=sourceMapperModel.getRowCount();
-        for(int i=0; i<rowCount; i++) {
-            String sourceDir=sourceMapperModel.getValueAt(i, 0)!=null?sourceMapperModel.getValueAt(i, 0).toString():"";
-            String targetDir=sourceMapperModel.getValueAt(i, 1)!=null?sourceMapperModel.getValueAt(i, 1).toString():"";
-            String patchDir=sourceMapperModel.getValueAt(i, 2)!=null?sourceMapperModel.getValueAt(i, 2).toString():"";
-            if(StringUtils.isNotBlank(sourceDir)&&StringUtils.isNotBlank(targetDir)){
-                SourceMapper sourceMapper=new SourceMapper(sourceDir,targetDir,patchDir);
+        DefaultTableModel sourceMapperModel = (DefaultTableModel) GITLOGSOURCEMAPPERjTable.getModel();
+        int rowCount = sourceMapperModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            String sourceDir = sourceMapperModel.getValueAt(i, 0) != null ? sourceMapperModel.getValueAt(i, 0).toString() : "";
+            String targetDir = sourceMapperModel.getValueAt(i, 1) != null ? sourceMapperModel.getValueAt(i, 1).toString() : "";
+            String patchDir = sourceMapperModel.getValueAt(i, 2) != null ? sourceMapperModel.getValueAt(i, 2).toString() : "";
+            if (StringUtils.isNotBlank(sourceDir) && StringUtils.isNotBlank(targetDir)) {
+                SourceMapper sourceMapper = new SourceMapper(sourceDir, targetDir, patchDir);
                 sourceMappers.add(sourceMapper);
             }
         }
-       ProjectTypeEnum projectType=ProjectTypeEnum.SINGLEMODULE;
-       if( GITLOGPROJECTMUTILjRadioButton.isSelected()){
-         projectType=ProjectTypeEnum.MULTIMODULE;
-       }
+        ProjectTypeEnum projectType = ProjectTypeEnum.SINGLEMODULE;
+        if (GITLOGPROJECTMUTILjRadioButton.isSelected()) {
+            projectType = ProjectTypeEnum.MULTIMODULE;
+        }
         GitProjectInfo projectInfo = new GitProjectInfo();
         projectInfo.setProjectName(projectName);
         projectInfo.setProjectType(projectType);
-        if(!projectPath.endsWith("/")){
-         projectPath=projectPath+"/";
+        if (!projectPath.endsWith("/")) {
+            projectPath = projectPath + "/";
         }
         projectInfo.setTargetBaseDir(projectPath);
         projectInfo.setVersionManagerTypeEnum(VersionManagerTypeEnum.GIT);
@@ -1017,67 +1190,42 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         patchInfo.setPatchFileDir(outputPath);
         patchInfo.setPatchFile(logPath);
         GeneratePatchExecutor.execute((ProjectInfo) projectInfo, patchInfo);
-        MainFrameConsoleUtil.println("打包完成");
+        LOGGER.info("打包完成");
     }//GEN-LAST:event_GITLOGOUTPACKjButtonActionPerformed
     /**
      * 点击清空控制台的内容
-     * @param evt 
+     *
+     * @param evt
      */
     private void globalConsoleClearjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_globalConsoleClearjButtonActionPerformed
-        globalConsolejTextPane.setText(""); 
+        globalConsolejTextPane.setText("");
     }//GEN-LAST:event_globalConsoleClearjButtonActionPerformed
     /**
      * GIT服务器增量项目目录路径选择
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITSERVERPROJECTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVERPROJECTjButtonActionPerformed
         //设置只能选择目录
-        globaljFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int i = globaljFileChooser.showOpenDialog(null);
-        if (i == JFileChooser.APPROVE_OPTION) { //打开文件
-            String path = globaljFileChooser.getSelectedFile().getAbsolutePath();
-            String name = globaljFileChooser.getSelectedFile().getName();
-            MainFrameConsoleUtil.println("当前文件路径：" + path + ";\n当前文件名：" + name);
-            GITSERVERPROJECTPATHjTextField.setText(path);
-        } else {
-            MainFrameConsoleUtil.println("没有选中文件");
-        }    
-        
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITSERVERPROJECTPATHjTextField, null, null);
     }//GEN-LAST:event_GITSERVERPROJECTjButtonActionPerformed
     /**
      * GIT服务器增量项目本地.git文件夹目录路径选择
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITSERVERPATHjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVERPATHjButtonActionPerformed
         //设置只能选择目录
-        globaljFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int i = globaljFileChooser.showOpenDialog(null);
-        if (i == JFileChooser.APPROVE_OPTION) { //打开文件
-            String path = globaljFileChooser.getSelectedFile().getAbsolutePath();
-            String name = globaljFileChooser.getSelectedFile().getName();
-            MainFrameConsoleUtil.println("当前文件路径：" + path + ";\n当前文件名：" + name);
-            GITSERVEROUTPUTjTextField.setText(path);
-        } else {
-            MainFrameConsoleUtil.println("没有选中文件");
-        }
-        
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITSERVERPATHjTextField, null, null);
     }//GEN-LAST:event_GITSERVERPATHjButtonActionPerformed
     /**
      * GIT服务器增量输出目录选择
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITSERVEROUTPUTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVEROUTPUTjButtonActionPerformed
         //设置只能选择目录
-        globaljFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int i = globaljFileChooser.showOpenDialog(null);
-        if (i == JFileChooser.APPROVE_OPTION) { //打开文件或目录
-            String path = globaljFileChooser.getSelectedFile().getAbsolutePath();
-            String name = globaljFileChooser.getSelectedFile().getName();
-            MainFrameConsoleUtil.println("当前文件路径：" + path + ";\n当前文件名：" + name);
-            GITSERVEROUTPUTjTextField.setText(path);
-        } else {
-            MainFrameConsoleUtil.println("没有选中文件/目录");
-        }    
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITSERVEROUTPUTjTextField, null, null);
     }//GEN-LAST:event_GITSERVEROUTPUTjButtonActionPerformed
 
     private void GITSERVERSOURCEMAPPERjTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GITSERVERSOURCEMAPPERjTableMouseClicked
@@ -1085,55 +1233,142 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_GITSERVERSOURCEMAPPERjTableMouseClicked
     /**
      * GIT服务器增量映射表添加一空行
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITSERVERADDjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVERADDjButtonActionPerformed
         ((DefaultTableModel) GITSERVERSOURCEMAPPERjTable.getModel()).addRow(new String[]{"", "", ""});
     }//GEN-LAST:event_GITSERVERADDjButtonActionPerformed
     /**
      * GIT服务器增量删除一行
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITSERVERDELjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVERDELjButtonActionPerformed
         ((DefaultTableModel) GITSERVERSOURCEMAPPERjTable.getModel()).removeRow(GITSERVERSOURCEMAPPERjTable.getSelectedRow());
     }//GEN-LAST:event_GITSERVERDELjButtonActionPerformed
-
+    /**
+     * GIT服务器增量-保存配置文件
+     * @param evt 
+     */
     private void GITSERVERSAVECONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVERSAVECONFIGjButtonActionPerformed
-        // TODO add your handling code here:
+        String projectName = GITSERVERPROJECTNAMEjTextField.getText();
+        String projectPath = GITSERVERPROJECTPATHjTextField.getText();
+        String logPath = GITSERVERPATHjTextField.getText();
+        String outputPath = GITSERVEROUTPUTjTextField.getText();
+        String startVersion = GITSERVERVERSIONSTARTjTextField.getText();
+        String endVersion = GITSERVERVERSIONENDjTextField.getText();
+        List<SourceMapper> sourceMappers = new ArrayList<>();
+        DefaultTableModel sourceMapperModel = (DefaultTableModel) GITSERVERSOURCEMAPPERjTable.getModel();
+        int rowCount = sourceMapperModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            String sourceDir = sourceMapperModel.getValueAt(i, 0) != null ? sourceMapperModel.getValueAt(i, 0).toString() : "";
+            String targetDir = sourceMapperModel.getValueAt(i, 1) != null ? sourceMapperModel.getValueAt(i, 1).toString() : "";
+            String patchDir = sourceMapperModel.getValueAt(i, 2) != null ? sourceMapperModel.getValueAt(i, 2).toString() : "";
+            if (StringUtils.isNotBlank(sourceDir) && StringUtils.isNotBlank(targetDir)) {
+                SourceMapper sourceMapper = new SourceMapper(sourceDir, targetDir, patchDir);
+                sourceMappers.add(sourceMapper);
+            }
+        }
+        ProjectTypeEnum projectType = ProjectTypeEnum.SINGLEMODULE;
+        if (GITSERVERPROJECTMUTILjRadioButton.isSelected()) {
+            projectType = ProjectTypeEnum.MULTIMODULE;
+        }
+        gitServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+
+        if (gitServerProjectConfig != null) {
+            try {
+                //DocumentHelper提供了创建Document对象的方法 
+                Document document = DocumentHelper.createDocument();
+                //添加节点信息 
+                Element rootElement = document.addElement("patch-config");
+                //这里可以继续添加子节点，也可以指定内容 
+                //rootElement.setText("这个是module标签的文本信息");
+                Element projectNameElement = rootElement.addElement("project-name");
+                projectNameElement.setText(projectName);
+                Element projectPathElement = rootElement.addElement("project-path");
+                projectPathElement.setText(projectPath);
+                Element logPathElement = rootElement.addElement("log-path");
+                logPathElement.setText(logPath);
+                Element outputPathElement = rootElement.addElement("output-path");
+                outputPathElement.setText(outputPath);
+                Element projectTypeElement = rootElement.addElement("project-type");
+                projectTypeElement.setText(projectType.name());
+                Element genTypeTypeElement = rootElement.addElement("gen-type");
+                genTypeTypeElement.setText(GenTypeEnum.VERSION.name());
+                Element versionManagerTypeElement = rootElement.addElement("version-manager-type");
+                versionManagerTypeElement.setText(VersionManagerTypeEnum.GIT.name());
+                Element startVersionElement = rootElement.addElement("start-version");
+                startVersionElement.setText(startVersion);
+                Element endVersionElement = rootElement.addElement("end-version");
+                endVersionElement.setText(endVersion);
+                if (sourceMappers.size() > 0) {
+                    Element sourceMappersElement = rootElement.addElement("source-mappers");
+                    for (SourceMapper sourceMapper : sourceMappers) {
+                        Element sourceMapperElement = sourceMappersElement.addElement("source-mapper");
+                        Element sourceDirElement = sourceMapperElement.addElement("source-dir");
+                        sourceDirElement.setText(sourceMapper.getSourceDir());
+                        Element targetDirElement = sourceMapperElement.addElement("target-dir");
+                        targetDirElement.setText(sourceMapper.getTargetDir());
+                        Element patchDirElement = sourceMapperElement.addElement("patch-dir");
+                        patchDirElement.setText(sourceMapper.getPatchDir());
+                    }
+                }
+                Writer fileWriter = new FileWriter(gitServerProjectConfig);
+                //设置文件编码  
+                OutputFormat xmlFormat = new OutputFormat();
+                xmlFormat.setEncoding("UTF-8");
+                // 设置换行 
+                xmlFormat.setNewlines(true);
+                // 生成缩进 
+                xmlFormat.setIndent(true);
+                // 使用4个空格进行缩进, 可以兼容文本编辑器 
+                xmlFormat.setIndent("    ");
+                //dom4j提供了专门写入文件的对象XMLWriter 
+                XMLWriter xmlWriter = new XMLWriter(fileWriter, xmlFormat);
+                xmlWriter.write(document);
+                xmlWriter.flush();
+                xmlWriter.close();
+                LOGGER.info("GIT服务器增量保存配置文件保存成功！路径：{}", gitServerProjectConfig);
+            } catch (IOException e) {
+                LOGGER.error("GIT服务器增量保存配置文件异常", e);
+            }
+        }
     }//GEN-LAST:event_GITSERVERSAVECONFIGjButtonActionPerformed
     /**
      * GIT服务器增量点击打包按钮执行打包事件
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITSERVEROUTPACKjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVEROUTPACKjButtonActionPerformed
         String projectName = GITSERVERPROJECTNAMEjTextField.getText();
         String projectPath = GITSERVERPROJECTPATHjTextField.getText();
         String gitRepositoryUrl = GITSERVERPATHjTextField.getText();
         String outputPath = GITSERVEROUTPUTjTextField.getText();
-        String startVersion=GITSERVERVERSIONSTARTjTextField.getText();
-        String endVersion=GITSERVERVERSIONENDjTextField.getText();
-        
+        String startVersion = GITSERVERVERSIONSTARTjTextField.getText();
+        String endVersion = GITSERVERVERSIONENDjTextField.getText();
+
         List<SourceMapper> sourceMappers = new ArrayList<>();
-        DefaultTableModel  sourceMapperModel=(DefaultTableModel)GITSERVERSOURCEMAPPERjTable.getModel();
-        int rowCount=sourceMapperModel.getRowCount();
-        for(int i=0; i<rowCount; i++) {
-            String sourceDir=sourceMapperModel.getValueAt(i, 0)!=null?sourceMapperModel.getValueAt(i, 0).toString():"";
-            String targetDir=sourceMapperModel.getValueAt(i, 1)!=null?sourceMapperModel.getValueAt(i, 1).toString():"";
-            String patchDir=sourceMapperModel.getValueAt(i, 2)!=null?sourceMapperModel.getValueAt(i, 2).toString():"";
-            if(StringUtils.isNotBlank(sourceDir)&&StringUtils.isNotBlank(targetDir)){
-                SourceMapper sourceMapper=new SourceMapper(sourceDir,targetDir,patchDir);
+        DefaultTableModel sourceMapperModel = (DefaultTableModel) GITSERVERSOURCEMAPPERjTable.getModel();
+        int rowCount = sourceMapperModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            String sourceDir = sourceMapperModel.getValueAt(i, 0) != null ? sourceMapperModel.getValueAt(i, 0).toString() : "";
+            String targetDir = sourceMapperModel.getValueAt(i, 1) != null ? sourceMapperModel.getValueAt(i, 1).toString() : "";
+            String patchDir = sourceMapperModel.getValueAt(i, 2) != null ? sourceMapperModel.getValueAt(i, 2).toString() : "";
+            if (StringUtils.isNotBlank(sourceDir) && StringUtils.isNotBlank(targetDir)) {
+                SourceMapper sourceMapper = new SourceMapper(sourceDir, targetDir, patchDir);
                 sourceMappers.add(sourceMapper);
             }
         }
-       ProjectTypeEnum projectType=ProjectTypeEnum.SINGLEMODULE;
-       if( GITSERVERPROJECTMUTILjRadioButton.isSelected()){
-         projectType=ProjectTypeEnum.MULTIMODULE;
-       }
+        ProjectTypeEnum projectType = ProjectTypeEnum.SINGLEMODULE;
+        if (GITSERVERPROJECTMUTILjRadioButton.isSelected()) {
+            projectType = ProjectTypeEnum.MULTIMODULE;
+        }
         GitProjectInfo projectInfo = new GitProjectInfo();
         projectInfo.setProjectName(projectName);
         projectInfo.setProjectType(projectType);
-        if(!projectPath.endsWith("/")){
-         projectPath=projectPath+"/";
+        if (!projectPath.endsWith("/")) {
+            projectPath = projectPath + "/";
         }
         projectInfo.setTargetBaseDir(projectPath);
         projectInfo.setGitRepositoryUrl(gitRepositoryUrl);
@@ -1145,69 +1380,152 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         patchInfo.setStartVersion(startVersion);
         patchInfo.setEndVersion(endVersion);
         GeneratePatchExecutor.execute((ProjectInfo) projectInfo, patchInfo);
-        MainFrameConsoleUtil.println("打包完成");
+        LOGGER.info("打包完成");
     }//GEN-LAST:event_GITSERVEROUTPACKjButtonActionPerformed
     /**
      * SVN服务器增量-项目本地目录选择
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNSERVERPROJECTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNSERVERPROJECTjButtonActionPerformed
         // TODO add your handling code here:
-         globaljFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);//只能选择目录
-        int i = globaljFileChooser.showOpenDialog(null);
-        if (i == JFileChooser.APPROVE_OPTION) { //打开文件
-            String path = globaljFileChooser.getSelectedFile().getAbsolutePath();
-            String name = globaljFileChooser.getSelectedFile().getName();
-            MainFrameConsoleUtil.println("当前文件路径：" + path + ";\n当前文件名：" + name);
-            SVNSERVERPROJECTPATHjTextField.setText(path);
-        } else {
-            MainFrameConsoleUtil.println("没有选中文件");
-        }    
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNSERVERPROJECTPATHjTextField, null, null);
     }//GEN-LAST:event_SVNSERVERPROJECTjButtonActionPerformed
     /**
      * SVN服务器增量-增量包输出目录选择
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNSERVEROUTPUTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNSERVEROUTPUTjButtonActionPerformed
-        // TODO add your handling code here:
-        globaljFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);//只能选择目录
-        int i = globaljFileChooser.showOpenDialog(null);
-        if (i == JFileChooser.APPROVE_OPTION) { //打开文件
-            String path = globaljFileChooser.getSelectedFile().getAbsolutePath();
-            String name = globaljFileChooser.getSelectedFile().getName();
-            MainFrameConsoleUtil.println("当前文件路径：" + path + ";\n当前文件名：" + name);
-            SVNSERVEROUTPUTjTextField.setText(path);
-        } else {
-            MainFrameConsoleUtil.println("没有选中文件");
-        }    
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNSERVEROUTPUTjTextField, null, null);
     }//GEN-LAST:event_SVNSERVEROUTPUTjButtonActionPerformed
     private void SVNSERVERSOURCEMAPPERjTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SVNSERVERSOURCEMAPPERjTableMouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_SVNSERVERSOURCEMAPPERjTableMouseClicked
     /**
      * SVN服务器增量-映射表新增一行
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNSERVERADDjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNSERVERADDjButtonActionPerformed
-        ((DefaultTableModel) GITSERVERSOURCEMAPPERjTable.getModel()).addRow(new String[]{"", "", ""});
+        ((DefaultTableModel) SVNSERVERSOURCEMAPPERjTable.getModel()).addRow(new String[]{"", "", ""});
     }//GEN-LAST:event_SVNSERVERADDjButtonActionPerformed
     /**
      * SVN服务器增量-映射表删除一行
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNSERVERDELjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNSERVERDELjButtonActionPerformed
-        ((DefaultTableModel) GITSERVERSOURCEMAPPERjTable.getModel()).removeRow(GITSERVERSOURCEMAPPERjTable.getSelectedRow());
+        ((DefaultTableModel) SVNSERVERSOURCEMAPPERjTable.getModel()).removeRow(SVNSERVERSOURCEMAPPERjTable.getSelectedRow());
     }//GEN-LAST:event_SVNSERVERDELjButtonActionPerformed
     /**
      * SVN服务器增量-配置文件保存
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNSERVERSAVECONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNSERVERSAVECONFIGjButtonActionPerformed
         // TODO add your handling code here:
+        String projectName = SVNSERVERPROJECTNAMEjTextField.getText();
+        String projectPath = SVNSERVERPROJECTPATHjTextField.getText();
+        String svnPath = SVNSERVERPATHjTextField.getText();
+        String outputPath = SVNSERVEROUTPUTjTextField.getText();
+        String startVersion = SVNSERVERVERSIONSTARTjTextField.getText();
+        String endVersion = SVNSERVERVERSIONENDjTextField.getText();
+        String excludeVersion = SVNSERVEREXCLUDEjTextField.getText();
+        String acount = SVNSERVERACOUNTjTextField.getText();
+        String pwd = SVNSERVERPWDjTextField.getText();
+        String reviseMapper = SVNSERVERREVISEjTextField.getText();
+        
+        List<SourceMapper> sourceMappers = new ArrayList<>();
+        DefaultTableModel sourceMapperModel = (DefaultTableModel) SVNSERVERSOURCEMAPPERjTable.getModel();
+        int rowCount = sourceMapperModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            String sourceDir = sourceMapperModel.getValueAt(i, 0) != null ? sourceMapperModel.getValueAt(i, 0).toString() : "";
+            String targetDir = sourceMapperModel.getValueAt(i, 1) != null ? sourceMapperModel.getValueAt(i, 1).toString() : "";
+            String patchDir = sourceMapperModel.getValueAt(i, 2) != null ? sourceMapperModel.getValueAt(i, 2).toString() : "";
+            if (StringUtils.isNotBlank(sourceDir) && StringUtils.isNotBlank(targetDir)) {
+                SourceMapper sourceMapper = new SourceMapper(sourceDir, targetDir, patchDir);
+                sourceMappers.add(sourceMapper);
+            }
+        }
+        ProjectTypeEnum projectType = ProjectTypeEnum.SINGLEMODULE;
+        if (SVNSERVERPROJECTMUTILjRadioButton.isSelected()) {
+            projectType = ProjectTypeEnum.MULTIMODULE;
+        }
+        svnServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+
+        if (svnServerProjectConfig != null) {
+            try {
+                //DocumentHelper提供了创建Document对象的方法 
+                Document document = DocumentHelper.createDocument();
+                //添加节点信息 
+                Element rootElement = document.addElement("patch-config");
+                //这里可以继续添加子节点，也可以指定内容 
+                //rootElement.setText("这个是module标签的文本信息");
+                Element projectNameElement = rootElement.addElement("project-name");
+                projectNameElement.setText(projectName);
+                Element projectPathElement = rootElement.addElement("project-path");
+                projectPathElement.setText(projectPath);
+                Element svnPathElement = rootElement.addElement("svn-url");
+                svnPathElement.setText(svnPath);
+                Element acountElement = rootElement.addElement("svn-acount");
+                acountElement.setText(acount);
+                Element pwdElement = rootElement.addElement("svn-pwd");
+                pwdElement.setText(pwd);
+                Element reviseMapperElement = rootElement.addElement("revise-mapper");
+                reviseMapperElement.setText(reviseMapper);
+                Element outputPathElement = rootElement.addElement("output-path");
+                outputPathElement.setText(outputPath);
+                Element projectTypeElement = rootElement.addElement("project-type");
+                projectTypeElement.setText(projectType.name());
+                Element genTypeTypeElement = rootElement.addElement("gen-type");
+                genTypeTypeElement.setText(GenTypeEnum.VERSION.name());
+                Element versionManagerTypeElement = rootElement.addElement("version-manager-type");
+                versionManagerTypeElement.setText(VersionManagerTypeEnum.SVN.name());
+                Element startVersionElement = rootElement.addElement("start-version");
+                startVersionElement.setText(startVersion);
+                Element endVersionElement = rootElement.addElement("end-version");
+                endVersionElement.setText(endVersion);
+                Element excludeVersionElement = rootElement.addElement("exclude-version");
+                excludeVersionElement.setText(excludeVersion);
+                if (sourceMappers.size() > 0) {
+                    Element sourceMappersElement = rootElement.addElement("source-mappers");
+                    for (SourceMapper sourceMapper : sourceMappers) {
+                        Element sourceMapperElement = sourceMappersElement.addElement("source-mapper");
+                        Element sourceDirElement = sourceMapperElement.addElement("source-dir");
+                        sourceDirElement.setText(sourceMapper.getSourceDir());
+                        Element targetDirElement = sourceMapperElement.addElement("target-dir");
+                        targetDirElement.setText(sourceMapper.getTargetDir());
+                        Element patchDirElement = sourceMapperElement.addElement("patch-dir");
+                        patchDirElement.setText(sourceMapper.getPatchDir());
+                    }
+                }
+                Writer fileWriter = new FileWriter(svnServerProjectConfig);
+                //设置文件编码  
+                OutputFormat xmlFormat = new OutputFormat();
+                xmlFormat.setEncoding("UTF-8");
+                // 设置换行 
+                xmlFormat.setNewlines(true);
+                // 生成缩进 
+                xmlFormat.setIndent(true);
+                // 使用4个空格进行缩进, 可以兼容文本编辑器 
+                xmlFormat.setIndent("    ");
+                //dom4j提供了专门写入文件的对象XMLWriter 
+                XMLWriter xmlWriter = new XMLWriter(fileWriter, xmlFormat);
+                xmlWriter.write(document);
+                xmlWriter.flush();
+                xmlWriter.close();
+                LOGGER.info("SVN服务器增量保存配置文件保存成功！路径：{}", svnServerProjectConfig);
+            } catch (IOException e) {
+                LOGGER.error("SVN服务器增量保存配置文件异常", e);
+            }
+        }
+        
     }//GEN-LAST:event_SVNSERVERSAVECONFIGjButtonActionPerformed
     /**
      * SVN服务器增量-点击增量打包
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNSERVEROUTPACKjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNSERVEROUTPACKjButtonActionPerformed
         // TODO add your handling code here:
@@ -1215,41 +1533,46 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         String projectPath = SVNSERVERPROJECTPATHjTextField.getText();
         String svnUrl = SVNSERVERPATHjTextField.getText();
         String outputPath = SVNSERVEROUTPUTjTextField.getText();
-        String startVersion=SVNSERVERVERSIONSTARTjTextField.getText();
-        String endVersion=SVNSERVERVERSIONENDjTextField.getText();
-        String excludeVersion=SVNSERVERREVISEjTextField.getText();
-        String acount=SVNSERVERACOUNTjTextField.getText();
-        String pwd=SVNSERVERPWDjTextField.getText();
-        String reviseMapper=SVNSERVERREVISEjTextField.getText();
-        
+        String startVersion = SVNSERVERVERSIONSTARTjTextField.getText();
+        String endVersion = SVNSERVERVERSIONENDjTextField.getText();
+        String excludeVersion = SVNSERVERREVISEjTextField.getText();
+        String acount = SVNSERVERACOUNTjTextField.getText();
+        String pwd = SVNSERVERPWDjTextField.getText();
+        String reviseMapper = SVNSERVERREVISEjTextField.getText();
+
         List<SourceMapper> sourceMappers = new ArrayList<>();
-        DefaultTableModel  sourceMapperModel=(DefaultTableModel)SVNSERVERSOURCEMAPPERjTable.getModel();
-        int rowCount=sourceMapperModel.getRowCount();
-        for(int i=0; i<rowCount; i++) {
-            String sourceDir=sourceMapperModel.getValueAt(i, 0)!=null?sourceMapperModel.getValueAt(i, 0).toString():"";
-            String targetDir=sourceMapperModel.getValueAt(i, 1)!=null?sourceMapperModel.getValueAt(i, 1).toString():"";
-            String patchDir=sourceMapperModel.getValueAt(i, 2)!=null?sourceMapperModel.getValueAt(i, 2).toString():"";
-            if(StringUtils.isNotBlank(sourceDir)&&StringUtils.isNotBlank(targetDir)){
-                SourceMapper sourceMapper=new SourceMapper(sourceDir,targetDir,patchDir);
+        DefaultTableModel sourceMapperModel = (DefaultTableModel) SVNSERVERSOURCEMAPPERjTable.getModel();
+        int rowCount = sourceMapperModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            String sourceDir = sourceMapperModel.getValueAt(i, 0) != null ? sourceMapperModel.getValueAt(i, 0).toString() : "";
+            String targetDir = sourceMapperModel.getValueAt(i, 1) != null ? sourceMapperModel.getValueAt(i, 1).toString() : "";
+            String patchDir = sourceMapperModel.getValueAt(i, 2) != null ? sourceMapperModel.getValueAt(i, 2).toString() : "";
+            if (StringUtils.isNotBlank(sourceDir) && StringUtils.isNotBlank(targetDir)) {
+                SourceMapper sourceMapper = new SourceMapper(sourceDir, targetDir, patchDir);
                 sourceMappers.add(sourceMapper);
             }
         }
-       ProjectTypeEnum projectType=ProjectTypeEnum.SINGLEMODULE;
-       if( SVNSERVERPROJECTMUTILjRadioButton.isSelected()){
-         projectType=ProjectTypeEnum.MULTIMODULE;
-       }
+        ProjectTypeEnum projectType = ProjectTypeEnum.SINGLEMODULE;
+        if (SVNSERVERPROJECTMUTILjRadioButton.isSelected()) {
+            projectType = ProjectTypeEnum.MULTIMODULE;
+        }
         SvnProjectInfo projectInfo = new SvnProjectInfo();
         projectInfo.setProjectName(projectName);
         projectInfo.setProjectType(projectType);
-        if(!projectPath.endsWith("/")){
-         projectPath=projectPath+"/";
+        if (!projectPath.endsWith("/")) {
+            projectPath = projectPath + "/";
         }
         projectInfo.setTargetBaseDir(projectPath);
         projectInfo.setSvnUrl(svnUrl);
         projectInfo.setVersionManagerTypeEnum(VersionManagerTypeEnum.SVN);
         projectInfo.setSourceMappers(sourceMappers);
-        if(StringUtils.isNotBlank(reviseMapper)){
-            projectInfo.setReviseMapper(new ProjectReviseMapper(reviseMapper,""));
+        if (StringUtils.isNotBlank(reviseMapper)) {
+            String[] reviseArr=reviseMapper.split(":");
+            if(reviseArr.length==1){
+                projectInfo.setReviseMapper(new ProjectReviseMapper(reviseMapper, ""));
+            }else{
+                projectInfo.setReviseMapper(new ProjectReviseMapper(reviseArr[0], reviseArr[1]));
+            }
         }
         projectInfo.setSvnUsername(acount);
         projectInfo.setSvnPassword(pwd);
@@ -1262,11 +1585,235 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         if (StringUtils.isNotBlank(excludeVersion)) {
             excludeRevisions = Arrays.asList(excludeVersion.split(","));
         }
-        
+
         patchInfo.setExcludeRevisions(excludeRevisions);
         GeneratePatchExecutor.execute((ProjectInfo) projectInfo, patchInfo);
-        MainFrameConsoleUtil.println("打包完成");
+        LOGGER.info("打包完成");
     }//GEN-LAST:event_SVNSERVEROUTPACKjButtonActionPerformed
+
+    private void GITSERVERPROJECTCONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVERPROJECTCONFIGjButtonActionPerformed
+        if (StringUtils.isNotBlank(gitServerProjectConfig)) {
+            gitServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, gitLogProjectConfig,"xml");
+        } else {
+            gitServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+        }
+        LOGGER.info(gitServerProjectConfig);
+        if (StringUtils.isNotBlank(gitServerProjectConfig)) {
+            Document document = DOMUtils.getXMLByFilePath(gitServerProjectConfig);
+            Element root = document.getRootElement();
+            String genType = DOMUtils.getTextTrim(root, "gen-type");
+            String versionManagerType = DOMUtils.getTextTrim(root, "version-manager-type");
+            if (GenTypeEnum.VERSION.name().equals(genType) && VersionManagerTypeEnum.GIT.name().equals(versionManagerType)) {
+                String projectName = DOMUtils.getTextTrim(root, "project-name");
+                GITSERVERPROJECTNAMEjTextField.setText(projectName);
+                String projectPath = DOMUtils.getTextTrim(root, "project-path");
+                GITSERVERPROJECTPATHjTextField.setText(projectPath);
+                String logPath = DOMUtils.getTextTrim(root, "log-path");
+                GITSERVERPATHjTextField.setText(logPath);
+                String outputPath = DOMUtils.getTextTrim(root, "output-path");
+                GITSERVEROUTPUTjTextField.setText(outputPath);
+                String projectType = DOMUtils.getTextTrim(root, "project-type");
+                if (ProjectTypeEnum.MULTIMODULE.name().equals(projectType)) {
+                    GITSERVERPROJECTMUTILjRadioButton.setSelected(true);
+                } else {
+                    GITSERVERPROJECTSINGLEjRadioButton.setSelected(true);
+                }
+                String startVersion = DOMUtils.getTextTrim(root, "start-version");
+                GITSERVERVERSIONSTARTjTextField.setText(startVersion);
+                String endVersion = DOMUtils.getTextTrim(root, "end-version");
+                GITSERVERVERSIONENDjTextField.setText(endVersion);
+                
+                ((DefaultTableModel) GITSERVERSOURCEMAPPERjTable.getModel()).setRowCount(0);
+                Element sourceMappersElment = DOMUtils.getChildElement(root, "source-mappers");
+                if (sourceMappersElment != null) {
+                    List<Element> sourceMappers = DOMUtils.getChildElements(sourceMappersElment);
+                    if (sourceMappers != null) {
+                        for (int i = 0, j = sourceMappers.size(); i < j; i++) {
+                            Element curr = sourceMappers.get(i);
+                            String sourceDir = DOMUtils.getTextTrim(curr, "source-dir");
+                            String targetDir = DOMUtils.getTextTrim(curr, "target-dir");
+                            String patchDir = DOMUtils.getTextTrim(curr, "patch-dir");
+                            ((DefaultTableModel) GITSERVERSOURCEMAPPERjTable.getModel()).addRow(new String[]{sourceDir, targetDir, patchDir});
+                        }
+                    }
+                }
+                LOGGER.info("配置文件类型文件导入成功！");
+            }else{
+                LOGGER.error("配置文件类型文件gen-type、version-manager-type与当前类型不匹配！");
+            }
+
+        }
+    }//GEN-LAST:event_GITSERVERPROJECTCONFIGjButtonActionPerformed
+    /**
+     * SVN服务器增量-导入配置文件
+     * @param evt 
+     */
+    private void SVNSERVERPROJECTCONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNSERVERPROJECTCONFIGjButtonActionPerformed
+        if (StringUtils.isNotBlank(svnServerProjectConfig)) {
+            svnServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, svnServerProjectConfig,"xml");
+        } else {
+            svnServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+        }
+        LOGGER.info(svnServerProjectConfig);
+        if (StringUtils.isNotBlank(svnServerProjectConfig)) {
+            Document document = DOMUtils.getXMLByFilePath(svnServerProjectConfig);
+            Element root = document.getRootElement();
+            String genType = DOMUtils.getTextTrim(root, "gen-type");
+            String versionManagerType = DOMUtils.getTextTrim(root, "version-manager-type");
+            if (GenTypeEnum.VERSION.name().equals(genType) && VersionManagerTypeEnum.SVN.name().equals(versionManagerType)) {
+                String projectName = DOMUtils.getTextTrim(root, "project-name");
+                SVNSERVERPROJECTNAMEjTextField.setText(projectName);
+                String projectPath = DOMUtils.getTextTrim(root, "project-path");
+                SVNSERVERPROJECTPATHjTextField.setText(projectPath);
+                String svnPath = DOMUtils.getTextTrim(root, "svn-url");
+                SVNSERVERPATHjTextField.setText(svnPath);
+                String acount = DOMUtils.getTextTrim(root, "svn-acount");
+                SVNSERVERACOUNTjTextField.setText(acount);
+                String pwd = DOMUtils.getTextTrim(root, "svn-pwd");
+                SVNSERVERPWDjTextField.setText(pwd);
+                String excludeVersion = DOMUtils.getTextTrim(root, "exclude-version");
+                SVNSERVEREXCLUDEjTextField.setText(excludeVersion);
+                
+                String outputPath = DOMUtils.getTextTrim(root, "output-path");
+                SVNSERVEROUTPUTjTextField.setText(outputPath);
+                String projectType = DOMUtils.getTextTrim(root, "project-type");
+                if (ProjectTypeEnum.MULTIMODULE.name().equals(projectType)) {
+                    SVNSERVERPROJECTMUTILjRadioButton.setSelected(true);
+                } else {
+                    SVNSERVERPROJECTSINGLEjRadioButton.setSelected(true);
+                }
+                String startVersion = DOMUtils.getTextTrim(root, "start-version");
+                SVNSERVERVERSIONSTARTjTextField.setText(startVersion);
+                String endVersion = DOMUtils.getTextTrim(root, "end-version");
+                SVNSERVERVERSIONENDjTextField.setText(endVersion);
+                String reviseMapper = DOMUtils.getTextTrim(root, "revise-mapper");
+                SVNSERVERREVISEjTextField.setText(reviseMapper);
+                ((DefaultTableModel) SVNSERVERSOURCEMAPPERjTable.getModel()).setRowCount(0);
+                Element sourceMappersElment = DOMUtils.getChildElement(root, "source-mappers");
+                if (sourceMappersElment != null) {
+                    List<Element> sourceMappers = DOMUtils.getChildElements(sourceMappersElment);
+                    if (sourceMappers != null) {
+                        for (int i = 0, j = sourceMappers.size(); i < j; i++) {
+                            Element curr = sourceMappers.get(i);
+                            String sourceDir = DOMUtils.getTextTrim(curr, "source-dir");
+                            String targetDir = DOMUtils.getTextTrim(curr, "target-dir");
+                            String patchDir = DOMUtils.getTextTrim(curr, "patch-dir");
+                            ((DefaultTableModel) SVNSERVERSOURCEMAPPERjTable.getModel()).addRow(new String[]{sourceDir, targetDir, patchDir});
+                        }
+                    }
+                }
+                LOGGER.info("配置文件类型文件导入成功！");
+            }else{
+                LOGGER.error("配置文件类型文件gen-type、version-manager-type与当前类型不匹配！");
+            }
+
+        }
+    }//GEN-LAST:event_SVNSERVERPROJECTCONFIGjButtonActionPerformed
+    /**
+     * git日志增量-导入配置文件
+     * @param evt 
+     */
+    private void GITLOGPROJECTCONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGPROJECTCONFIGjButtonActionPerformed
+        if (StringUtils.isNotBlank(gitLogProjectConfig)) {
+            gitLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, gitLogProjectConfig,"xml");
+        } else {
+            gitLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+        }
+        LOGGER.info(gitLogProjectConfig);
+        if (StringUtils.isNotBlank(gitLogProjectConfig)) {
+            Document document = DOMUtils.getXMLByFilePath(gitLogProjectConfig);
+            Element root = document.getRootElement();
+            String genType = DOMUtils.getTextTrim(root, "gen-type");
+            String versionManagerType = DOMUtils.getTextTrim(root, "version-manager-type");
+            if (GenTypeEnum.LOG.name().equals(genType) && VersionManagerTypeEnum.GIT.name().equals(versionManagerType)) {
+                String projectName = DOMUtils.getTextTrim(root, "project-name");
+                GITLOGPROJECTNAMEjTextField.setText(projectName);
+                String projectPath = DOMUtils.getTextTrim(root, "project-path");
+                GITLOGPROJECTPATHjTextField.setText(projectPath);
+                String logPath = DOMUtils.getTextTrim(root, "log-path");
+                GITLOGPATHjTextField.setText(logPath);
+                String outputPath = DOMUtils.getTextTrim(root, "output-path");
+                GITLOGOUTPUTjTextField.setText(outputPath);
+                String projectType = DOMUtils.getTextTrim(root, "project-type");
+                if (ProjectTypeEnum.MULTIMODULE.name().equals(projectType)) {
+                    GITLOGPROJECTMUTILjRadioButton.setSelected(true);
+                } else {
+                    GITLOGPROJECTSINGLEjRadioButton.setSelected(true);
+                }
+                ((DefaultTableModel) GITLOGSOURCEMAPPERjTable.getModel()).setRowCount(0);
+                Element sourceMappersElment = DOMUtils.getChildElement(root, "source-mappers");
+                if (sourceMappersElment != null) {
+                    List<Element> sourceMappers = DOMUtils.getChildElements(sourceMappersElment);
+                    if (sourceMappers != null) {
+                        for (int i = 0, j = sourceMappers.size(); i < j; i++) {
+                            Element curr = sourceMappers.get(i);
+                            String sourceDir = DOMUtils.getTextTrim(curr, "source-dir");
+                            String targetDir = DOMUtils.getTextTrim(curr, "target-dir");
+                            String patchDir = DOMUtils.getTextTrim(curr, "patch-dir");
+                            ((DefaultTableModel) GITLOGSOURCEMAPPERjTable.getModel()).addRow(new String[]{sourceDir, targetDir, patchDir});
+                        }
+                    }
+                }
+                LOGGER.info("配置文件类型文件导入成功！");
+            }else{
+                LOGGER.error("配置文件类型文件gen-type、version-manager-type与当前类型不匹配！");
+            }
+
+        }
+    }//GEN-LAST:event_GITLOGPROJECTCONFIGjButtonActionPerformed
+    /**
+     * SVN日志增量-导入配置文件
+     *
+     * @param evt
+     */
+    private void SVNLOGPROJECTCONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGPROJECTCONFIGjButtonActionPerformed
+        if (StringUtils.isNotBlank(svnLogProjectConfig)) {
+            svnLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, svnLogProjectConfig, "xml");
+        } else {
+            svnLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+        }
+        LOGGER.info(svnLogProjectConfig);
+        if (StringUtils.isNotBlank(svnLogProjectConfig)) {
+            Document document = DOMUtils.getXMLByFilePath(svnLogProjectConfig);
+            Element root = document.getRootElement();
+            String genType = DOMUtils.getTextTrim(root, "gen-type");
+            String versionManagerType = DOMUtils.getTextTrim(root, "version-manager-type");
+            if (GenTypeEnum.LOG.name().equals(genType) && VersionManagerTypeEnum.SVN.name().equals(versionManagerType)) {
+                String projectName = DOMUtils.getTextTrim(root, "project-name");
+                SVNLOGPROJECTNAMEjTextField.setText(projectName);
+                String projectPath = DOMUtils.getTextTrim(root, "project-path");
+                SVNLOGPROJECTPATHjTextField.setText(projectPath);
+                String logPath = DOMUtils.getTextTrim(root, "log-path");
+                SVNLOGPATHjTextField.setText(logPath);
+                String outputPath = DOMUtils.getTextTrim(root, "output-path");
+                SVNLOGOUTPUTjTextField.setText(outputPath);
+                String projectType = DOMUtils.getTextTrim(root, "project-type");
+                if (ProjectTypeEnum.MULTIMODULE.name().equals(projectType)) {
+                    SVNLOGPROJECTMUTILjRadioButton.setSelected(true);
+                } else {
+                    SVNLOGPROJECTSINGLEjRadioButton.setSelected(true);
+                }
+                ((DefaultTableModel) SVNLOGSOURCEMAPPERjTable.getModel()).setRowCount(0);
+                Element sourceMappersElment = DOMUtils.getChildElement(root, "source-mappers");
+                if (sourceMappersElment != null) {
+                    List<Element> sourceMappers = DOMUtils.getChildElements(sourceMappersElment);
+                    if (sourceMappers != null) {
+                        for (int i = 0, j = sourceMappers.size(); i < j; i++) {
+                            Element curr = sourceMappers.get(i);
+                            String sourceDir = DOMUtils.getTextTrim(curr, "source-dir");
+                            String targetDir = DOMUtils.getTextTrim(curr, "target-dir");
+                            String patchDir = DOMUtils.getTextTrim(curr, "patch-dir");
+                            ((DefaultTableModel) SVNLOGSOURCEMAPPERjTable.getModel()).addRow(new String[]{sourceDir, targetDir, patchDir});
+                        }
+                    }
+                }
+                LOGGER.info("配置文件类型文件导入成功！");
+            }else{
+                LOGGER.error("配置文件类型文件gen-type、version-manager-type与当前类型不匹配！");
+            }
+
+        }
+    }//GEN-LAST:event_SVNLOGPROJECTCONFIGjButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1288,20 +1835,11 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(GeneratorMainJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 JFrame mainJFrame = new GeneratorMainJFrame();
-                MainFrameConsoleUtil.initConsole(((GeneratorMainJFrame)mainJFrame).CONSOLEtextArea,((GeneratorMainJFrame)mainJFrame).globalConsolejTextPane);
+                MainFrameConsoleUtil.initConsole(((GeneratorMainJFrame) mainJFrame).CONSOLEtextArea, ((GeneratorMainJFrame) mainJFrame).globalConsolejTextPane);
                 Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
                 mainJFrame.setIconImage(Toolkit.getDefaultToolkit().getImage("reportTask.png"));
                 mainJFrame.setLocation((screen.width - mainJFrame.getSize().width) / 2, (screen.height - mainJFrame.getSize().height) / 2);//使启动窗口居中显示
@@ -1310,7 +1848,50 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         });
     }
 
+    /**
+     * @param jFileChooserType FILES_ONLY = 0| DIRECTORIES_ONLY =
+     * 1|FILES_AND_DIRECTORIES = 2
+     * @param jTextField
+     */
+    private String doJfileChooseAction(int jFileChooserType, javax.swing.JTextField jTextField, String configPath, String fileSuffix) {
+        globaljFileChooser.setFileSelectionMode(jFileChooserType);//只能选择目录
+        globaljFileChooser.resetChoosableFileFilters();
+        if (StringUtils.isNotBlank(fileSuffix)) {
+            globaljFileChooser.setFileFilter(new FileSuffixFilter(fileSuffix));
+        }
+        if (StringUtils.isNotBlank(configPath)) {
+            File confPath = new File(configPath);
+            if (confPath.isDirectory()) {
+                globaljFileChooser.setCurrentDirectory(confPath);
+            } else if (confPath.isFile()) {
+                globaljFileChooser.setSelectedFile(confPath);
+            }
+        } else {
+            globaljFileChooser.setSelectedFile(null);
+        }
+
+        int i = globaljFileChooser.showOpenDialog(null);
+        String path = null;
+        if (i == JFileChooser.APPROVE_OPTION) { //打开文件
+            path = globaljFileChooser.getSelectedFile().getAbsolutePath();
+            String name = globaljFileChooser.getSelectedFile().getName();
+            LOGGER.info("当前文件路径：" + path + ";当前文件名：" + name);
+            if (jTextField != null) {
+                jTextField.setText(path);
+            }
+        } else {
+            LOGGER.info("没有选中文件");
+        }
+        return path;
+    }
+
     JFileChooser globaljFileChooser = new javax.swing.JFileChooser();
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneratorMainJFrame.class);
+    private String svnLogProjectConfig = null;
+    private String svnServerProjectConfig = null;
+    private String gitLogProjectConfig = null;
+    private String gitServerProjectConfig = null;
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel CONSOLEjLabel;
     private java.awt.TextArea CONSOLEtextArea;
@@ -1323,6 +1904,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private javax.swing.JButton GITLOGPATHjButton;
     private javax.swing.JLabel GITLOGPATHjLabel;
     private javax.swing.JTextField GITLOGPATHjTextField;
+    private javax.swing.JButton GITLOGPROJECTCONFIGjButton;
     private javax.swing.JRadioButton GITLOGPROJECTMUTILjRadioButton;
     private javax.swing.JLabel GITLOGPROJECTNAMEjLabel;
     private javax.swing.JTextField GITLOGPROJECTNAMEjTextField;
@@ -1346,6 +1928,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private javax.swing.JButton GITSERVERPATHjButton;
     private javax.swing.JLabel GITSERVERPATHjLabel;
     private javax.swing.JTextField GITSERVERPATHjTextField;
+    private javax.swing.JButton GITSERVERPROJECTCONFIGjButton;
     private javax.swing.JRadioButton GITSERVERPROJECTMUTILjRadioButton;
     private javax.swing.JLabel GITSERVERPROJECTNAMEjLabel;
     private javax.swing.JTextField GITSERVERPROJECTNAMEjTextField;
@@ -1364,6 +1947,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private javax.swing.JLabel GITSERVERVERSIONjLabel;
     private javax.swing.JPanel GITSERVERjPanel;
     private javax.swing.JScrollPane GITSERVERjScrollPane;
+    private javax.swing.JLabel PROJECTADDRESSjLabel;
     private javax.swing.JTabbedPane PatchjTabbedPane;
     private javax.swing.JButton SVNLOGADDjButton;
     private javax.swing.JButton SVNLOGDELjButton;
@@ -1374,6 +1958,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private javax.swing.JButton SVNLOGPATHjButton;
     private javax.swing.JLabel SVNLOGPATHjLabel;
     private javax.swing.JTextField SVNLOGPATHjTextField;
+    private javax.swing.JButton SVNLOGPROJECTCONFIGjButton;
     private javax.swing.JRadioButton SVNLOGPROJECTMUTILjRadioButton;
     private javax.swing.JLabel SVNLOGPROJECTNAMEjLabel;
     private javax.swing.JTextField SVNLOGPROJECTNAMEjTextField;
@@ -1393,13 +1978,14 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private javax.swing.JButton SVNSERVERADDjButton;
     private javax.swing.JButton SVNSERVERDELjButton;
     private javax.swing.JLabel SVNSERVEREXCLUDEjLabel;
-    private javax.swing.JTextField SVNSERVEREXCLUDEjTextField1;
+    private javax.swing.JTextField SVNSERVEREXCLUDEjTextField;
     private javax.swing.JButton SVNSERVEROUTPACKjButton;
     private javax.swing.JButton SVNSERVEROUTPUTjButton;
     private javax.swing.JLabel SVNSERVEROUTPUTjLabel;
     private javax.swing.JTextField SVNSERVEROUTPUTjTextField;
     private javax.swing.JLabel SVNSERVERPATHjLabel;
     private javax.swing.JTextField SVNSERVERPATHjTextField;
+    private javax.swing.JButton SVNSERVERPROJECTCONFIGjButton;
     private javax.swing.JRadioButton SVNSERVERPROJECTMUTILjRadioButton;
     private javax.swing.JLabel SVNSERVERPROJECTNAMEjLabel;
     private javax.swing.JTextField SVNSERVERPROJECTNAMEjTextField;
@@ -1427,3 +2013,30 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private javax.swing.JTextPane globalConsolejTextPane;
     // End of variables declaration//GEN-END:variables
 }
+
+class FileSuffixFilter extends FileFilter {
+
+    private final static String DESCRIPTION = "FILESUFFIX";
+    private String fileSuffix = "xml";
+
+    public FileSuffixFilter() {
+    }
+
+    public FileSuffixFilter(String fileSuffix) {
+        this.fileSuffix = fileSuffix;
+    }
+
+    @Override
+    public boolean accept(File f) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String fileName = f.getName();
+        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+        return fileSuffix.equals(suffix);
+    }
+
+    @Override
+    public String getDescription() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return DESCRIPTION;
+    }
+};
