@@ -23,38 +23,30 @@
 		 6.配置按钮：点击导入项目打包的配置（配置必须以.xml结尾）
 		 7.保存按钮：点击保存当前项目打包的配置（配置必须以.xml结尾）
 	GIT服务器增量私有配置部分：
-			1.GIT本地URL路径：对应项目在本地的.git目录；例如D:\Users\Administrato\patch\git\.git
-			2.GIT范围版本：要打包的GIT提交版本范围；例如：757212d，544515f
+		 1.GIT本地URL路径：对应项目在本地的.git目录；例如D:\Users\Administrato\patch\git\.git
+		 2.GIT范围版本：要打包的GIT提交版本范围；例如：757212d，544515f
 	SVN服务器增量私有配置部分：
-			1.SVN URL路径：对应项目在SVN服务器的地址；例如https://xxxxx/svn/scrm/tags/ump20170420_chery_pc
-			2.SVN范围版本：要打包的SVN提交版本范围；例如：14431，14439
-			3.修正路径：从svn服务器获取的增量路径中可能包含多余的在本地不存在的目录；例
-                          如：/tags/ump20170420_chery_pc/src/main/webapp/WEB-INF/views/cherrywcc/wccchrescue/list.jspx
-			  可以设置该值为 /tags:将其替换为空,/tags为需要替换的路径,:后面的空表示将/tags去掉;还可以将其设置/tags/ump20170420_chery_pc:ump ,表示本地项目文件名为ump
-			4.SVN账户：svn服务器的账户
-			5.SVN密码：svn服务器的密码
-			6.排除版本：svn版本范围内需要排除掉的不用发版的版本号,多个版本以逗号分隔；
+		 1.SVN URL路径：对应项目在SVN服务器的地址；例如https://xxxxx/svn/scrm/tags/ump20170420_chery_pc
+		 2.SVN范围版本：要打包的SVN提交版本范围；例如：14431，14439
+		 3.修正路径：从svn服务器获取的增量路径中可能包含多余的在本地不存在的目录；例
+                   如：/tags/ump20170420_chery_pc/src/main/webapp/WEB-INF/views/cherrywcc/wccchrescue/list.jspx
+		   可以设置该值为 /tags:将其替换为空,/tags为需要替换的路径,:后面的空表示将/tags去掉;还可以将其设
+                   置/tags/ump20170420_chery_pc:ump ,表示本地项目文件名为ump
+		 4.SVN账户：svn服务器的账户
+		 5.SVN密码：svn服务器的密码
+		 6.排除版本：svn版本范围内需要排除掉的不用发版的版本号,多个版本以逗号分隔；
 	GIT日志增量私有配置部分
-			1.GIT日志路径：对应的git提交日志存放的本地路径；
-			  该路径或得方式可以通过右键点击项目-Team-show in history-视图中会显示提交的版本，选择需要发布的某个版本拷贝右下角的本次版本的提交路径存入GIT提交日志即可。
-			  例如 patch-generator/src/main/java/com/empire/patch/generator/GeneratePatchExecutor.java
-				  patch-generator/src/main/java/com/empire/patch/generator/GitPatchGenerator.java
+		 1.GIT日志路径：对应的git提交日志存放的本地路径；
+		   该路径或得方式可以通过右键点击项目-Team-show in history-视图中会显示提交的版本，选择需要发布的某个版本拷贝
+                   右下角的本次版本的提交路径存入GIT提交日志即可。
+		   例如 patch-generator/src/main/java/com/empire/patch/generator/GeneratePatchExecutor.java
+		        patch-generator/src/main/java/com/empire/patch/generator/GitPatchGenerator.java
 	SVN日志增量私有配置部分	  
-			1.SVN日志路径：对应SVN提交日志存放的本地路径；
-			  日志记录方式，提交SVN后控制台会输出提交日志，将其拷贝到.txt结尾的日志文件中保存起来，用于发版
-			  内容实例：(注意日志需顶格记录)
+		 1.SVN日志路径：对应SVN提交日志存放的本地路径；
+		   日志记录方式，提交SVN后控制台会输出提交日志，将其拷贝到.txt结尾的日志文件中保存起来，用于发版
+		   内容实例：(注意日志需顶格记录)
 
-commit -m "后台解绑车辆导出报错bug" D:/SpringRooWorkSpace/ump20170420_chery_pc/src/main/java/com/nineclient/cherry/wcc/web/WccChVehicleController.java
-    Sending        D:/SpringRooWorkSpace/ump20170420_chery_pc/src/main/java/com/nineclient/cherry/wcc/web/WccChVehicleController.java
-    Transmitting file data ...
-    Committed revision 14467.
-commit -m "1.服务点评bug修复2.道路救援bug修复3.全屏报表(二阶)bug修复" D:/SpringRooWorkSpace/ump20170420_chery_pc/src/main/java/com/nineclient/cherry/wcc/web/WccChRescueController.java D:/SpringRooWorkSpace/ump20170420_chery_pc/src/main/java/com/nineclient/cherry/wcc/model/WccChServiceReview.java D:/SpringRooWorkSpace/ump20170420_chery_pc/src/main/webapp/WEB-INF/views/cheryreport/RegAndAuthResult.jsp
-    Sending        D:/SpringRooWorkSpace/ump20170420_chery_pc/src/main/java/com/nineclient/cherry/wcc/model/WccChServiceReview.java
-    Sending        D:/SpringRooWorkSpace/ump20170420_chery_pc/src/main/java/com/nineclient/cherry/wcc/web/WccChRescueController.java
+commit -m "1.服务点评bug修复2.道路救援bug修复3.全屏报表(二阶)bug修复"      
     Sending        D:/SpringRooWorkSpace/ump20170420_chery_pc/src/main/webapp/WEB-INF/views/cheryreport/RegAndAuthResult.jsp
     Transmitting file data ...
     Committed revision 14471.
-commit -m "经销商无法查询出自己的服务点评数据bug修复" D:/SpringRooWorkSpace/ump20170420_chery_pc/src/main/java/com/nineclient/cherry/wcc/model/WccChServiceReview.java
-    Sending        D:/SpringRooWorkSpace/ump20170420_chery_pc/src/main/java/com/nineclient/cherry/wcc/model/WccChServiceReview.java
-    Transmitting file data ...
-    Committed revision 14472.
