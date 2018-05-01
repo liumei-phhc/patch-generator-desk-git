@@ -157,61 +157,6 @@
                     <argLine>-Dfile.encoding=UTF-8</argLine>   
                 </configuration>
             </plugin>
-<!--            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.empire.patch.generator.desk.GeneratorMainJFrame</mainClass>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-                    </archive>
-                    <classesDirectory>
-                    </classesDirectory>
-                </configuration>
-            </plugin>-->
-<!--            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <filters>
-                              <filter>
-                                <artifact>*:*</artifact>
-                                <excludes>
-                                  <exclude>META-INF/*.SF</exclude>
-                                  <exclude>META-INF/*.DSA</exclude>
-                                  <exclude>META-INF/*.RSA</exclude>
-                                </excludes>
-                              </filter>
-                            </filters>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.empire.patch.generator.desk.GeneratorMainJFrame</mainClass>
-                                </transformer>
-                                <transformer  
-                                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">  
-                                    <resource>META-INF/spring.handlers</resource>  
-                                </transformer>  
-                                <transformer  
-                                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">  
-                                    <resource>META-INF/spring.schemas</resource>  
-                                </transformer>  
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
             <!-- 拷贝依赖的jar包到lib目录 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -232,6 +177,110 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.empire.patch.generator.desk.GeneratorMainJFrame</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                    </archive>
+                    <classesDirectory>
+                    </classesDirectory>
+                </configuration>
+            </plugin>
+            
+<!--            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>1.7.22-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>l4j-gui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <outfile>target/${project.artifactId}.exe</outfile>
+                            <jar>target/${project.artifactId}-${project.version}.jar</jar>
+                            <errTitle>XXXXXXXXXXX</errTitle>
+                            <downloadUrl>XXXXXXXXXXXXXXXXXXX</downloadUrl>
+                            <classPath>
+                                <mainClass>XXXXXXXXXXXXXXXXXXXXX</mainClass>
+                            </classPath>
+                            <icon>XXXXXXXX.ico</icon>
+                            <jre>
+                                <path>jre7</path>
+                                <minVersion>1.7.0</minVersion>
+                                <maxVersion>1.8.0</maxVersion>
+                                <initialHeapSize>128</initialHeapSize>
+                                <maxHeapSize>1024</maxHeapSize>
+                                <jdkPreference>preferJre</jdkPreference>
+                                <runtimeBits>32</runtimeBits>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>0.${project.version}</fileVersion>
+                                <txtFileVersion>0.${project.version}</txtFileVersion>
+                                <fileDescription>XXXXXXXXXXX</fileDescription>
+                                <copyright>XXXXXXXXXXXXXXX</copyright>
+                                <productVersion>0.${project.version}</productVersion>
+                                <txtProductVersion>0.${project.version}</txtProductVersion>
+                                <productName>${project.artifactId}</productName>
+                                <companyName>XXXXXXXXXXXXXX</companyName>
+                                <language>SIMPLIFIED_CHINESE</language>
+                                <internalName>${project.artifactId}</internalName>
+                                <originalFilename>${project.artifactId}-${project.version}.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.empire.patch.generator.desk.GeneratorMainJFrame</mainClass>
+                                </transformer>
+                                <transformer  
+                                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">  
+                                    <resource>META-INF/spring.handlers</resource>  
+                                </transformer>  
+                                <transformer  
+                                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">  
+                                    <resource>META-INF/spring.schemas</resource>  
+                                </transformer>  
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
             <plugin>  
                 <artifactId>maven-assembly-plugin</artifactId>  
                 <version>3.0.0</version>  
@@ -247,14 +296,15 @@
                 </configuration>  
                 <executions>  
                     <execution>  
-                        <id>make-assembly</id> <!-- this is used for inheritance merges -->  
-                        <phase>package</phase> <!-- bind to the packaging phase -->  
+                          this is used for inheritance merges ，    bind to the packaging phase   
+                        <id>make-assembly</id>   
+                        <phase>package</phase>  
                         <goals>  
                             <goal>single</goal>  
                         </goals>  
                     </execution>  
                 </executions>  
-            </plugin>  
+            </plugin>  -->
         </plugins>
     </build>
 </project>
