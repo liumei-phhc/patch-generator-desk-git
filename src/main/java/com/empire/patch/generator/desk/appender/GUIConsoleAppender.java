@@ -1,3 +1,6 @@
+/**
+ * Copyright &copy; 2018 <a href="https://gitee.com/hackempire/patch-generator-desk">patch-generator-desk</a> All rights reserved.
+ */
 package com.empire.patch.generator.desk.appender;
 
 import com.empire.patch.generator.desk.utils.MainFrameConsoleUtil;
@@ -12,7 +15,10 @@ import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-
+/**
+ * 控制台实现
+ * @author aaron
+ */
 @Plugin(name = "guiConsoleAppender", category = "Core", elementType = "appender", printObject = true)
 public class GUIConsoleAppender extends AbstractAppender {
 

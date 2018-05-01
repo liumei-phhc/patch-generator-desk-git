@@ -1,3 +1,6 @@
+/**
+ * Copyright &copy; 2018 <a href="https://gitee.com/hackempire/patch-generator-desk">patch-generator-desk</a> All rights reserved.
+ */
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -15,8 +18,8 @@ import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 
 /**
- *
- * @author Administrator
+ * 控制台工具类
+ * @author aaron
  */
 public class MainFrameConsoleUtil {
     private static java.awt.TextArea console;
