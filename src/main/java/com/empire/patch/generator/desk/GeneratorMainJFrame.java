@@ -185,7 +185,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Empire全自动打包神器v2.0_Creat By Aaron【Q群456742016】");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        setIconImage(Toolkit.getDefaultToolkit().getImage("reportTask.png"));
+        setIconImage(Toolkit.getDefaultToolkit().getImage("favicon-20180430115456304.ico"));
         setLocation(new java.awt.Point(0, 0));
         setName("mainframe"); // NOI18N
         setSize(new java.awt.Dimension(300, 200));
@@ -1841,7 +1841,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                 JFrame mainJFrame = new GeneratorMainJFrame();
                 MainFrameConsoleUtil.initConsole(((GeneratorMainJFrame) mainJFrame).CONSOLEtextArea, ((GeneratorMainJFrame) mainJFrame).globalConsolejTextPane);
                 Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-                mainJFrame.setIconImage(Toolkit.getDefaultToolkit().getImage("reportTask.png"));
+                mainJFrame.setIconImage(Toolkit.getDefaultToolkit().getImage("favicon-20180430115456304.ico"));
                 mainJFrame.setLocation((screen.width - mainJFrame.getSize().width) / 2, (screen.height - mainJFrame.getSize().height) / 2);//使启动窗口居中显示
                 mainJFrame.setVisible(true);
             }
