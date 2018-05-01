@@ -18,6 +18,10 @@
 	2.GIT日志增量打包;
 	3.SVN服务器增量打包;
 	4.SVN日志增打包;
+
+### 历史轨迹
+    1.修复控制台无法显示操作日志的bug-----2018-05-01 18:48
+
 ### 使用教程：
 
 	通用部分：1.项目名称：必须填写本地项目的文件名；
@@ -57,8 +61,10 @@ commit -m "1.服务点评bug修复2.道路救援bug修复3.全屏报表(二阶)b
     Committed revision 14471.
 ### **相关项目** 
 
-[emsite分布式开源系统生态圈](https://gitee.com/hackempire/emsite-parent)
-
+1.  [emsite分布式开源系统生态圈](https://gitee.com/hackempire/emsite-parent)
+1.  [分布式服务框架Dubbo](https://github.com/apache/incubator-dubbo)
+1.  [Emsite-patch-generator](https://gitee.com/hackempire/patch-generator-parent)
+1.  [Emsite-patch-desk](https://gitee.com/hackempire/patch-generator-desk)
 ### **软件效果图** 
 ![增量打包神器桌面版](https://gitee.com/uploads/images/2018/0501/104841_1ff684e5_302505.png "DNN5WB9PEO(O10FT_4HWVY2.png")
 
