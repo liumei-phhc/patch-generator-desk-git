@@ -1,20 +1,20 @@
 # patch-generator-desk
 项目增量补丁包神器：全自动web增量打包发版，支持git/svn，支持多模块项目。
 
-# Author:aaron(QQ:592235961,QQ群:456742016)
+Author:aaron(QQ:592235961,QQ群:456742016)
 
 [项目地址：](https://gitee.com/hackempire/patch-generator-desk)
 [empire团队地址：](https://gitee.com/organizations/hackempire/)
 #软件介绍
-#	本软件是empire团队打造的一款用于application/web项目增量打包的全自动发版部署工具。
+	本软件是empire团队打造的一款用于application/web项目增量打包的全自动发版部署工具。
 #功能介绍：
-#	1.GIT服务器增量打包;
-#	2.GIT日志增量打包;
-#	3.SVN服务器增量打包;
-#	4.SVN日志增打包;
+	1.GIT服务器增量打包;
+	2.GIT日志增量打包;
+	3.SVN服务器增量打包;
+	4.SVN日志增打包;
 #使用教程：
-#	通用部分:  1.项目名称：必须填写本地项目的文件名；
-#			2.项目路径：必须填写项目的本地路径；
+	通用部分:  1.项目名称：必须填写本地项目的文件名；
+			2.项目路径：必须填写项目的本地路径；
 			3.输出目录：必须填写增量包的输出路径；
 			4.项目类型：必须选择项目类型是单模块项目还是多模块项目；
 			5.sourceMapper表：sourceDir：源码目录,targetDir：.class目录、源文件目录；patchDir：打包后放置的目录
