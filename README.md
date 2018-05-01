@@ -1,7 +1,7 @@
 #  **patch-generator-desk** 【技术QQ群：456742016】
 
 项目增量补丁包神器：全自动web增量打包发版，支持git/svn，支持多模块项目。
-- Author:aaron
+- author : aaron
 - [项目地址：https://gitee.com/hackempire/patch-generator-desk](https://gitee.com/hackempire/patch-generator-desk)
 - [empire团队地址：https://gitee.com/organizations/hackempire/](https://gitee.com/organizations/hackempire/)
 ### empire宣言
