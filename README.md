@@ -33,9 +33,11 @@
 		 5.sourceMapper表：sourceDir：源码目录,targetDir：.class目录、源文件目录；patchDir：打包后放置的目录
 		 6.配置按钮：点击导入项目打包的配置（配置必须以.xml结尾）
 		 7.保存按钮：点击保存当前项目打包的配置（配置必须以.xml结尾）
+
 	GIT服务器增量私有配置部分
 		 1.GIT本地URL路径：对应项目在本地的.git目录；例如D:\Users\Administrato\patch\git\.git
 		 2.GIT范围版本：要打包的GIT提交版本范围；例如：757212d，544515f
+
 	SVN服务器增量私有配置部分
 		 1.SVN URL路径：对应项目在SVN服务器的地址；例如https://xxxxx/svn/scrm/tags/ump20170420_chery_pc
 		 2.SVN范围版本：要打包的SVN提交版本范围；例如：14431，14439
@@ -46,12 +48,14 @@
 		 4.SVN账户：svn服务器的账户
 		 5.SVN密码：svn服务器的密码
 		 6.排除版本：svn版本范围内需要排除掉的不用发版的版本号,多个版本以逗号分隔；
+
 	GIT日志增量私有配置部分
 		 1.GIT日志路径：对应的git提交日志存放的本地路径；
 		   该路径或得方式可以通过右键点击项目-Team-show in history-视图中会显示提交的版本，选择需要发布的某个版本拷贝
                    右下角的本次版本的提交路径存入GIT提交日志即可。
 		   例如 patch-generator/src/main/java/com/empire/patch/generator/GeneratePatchExecutor.java
 		        patch-generator/src/main/java/com/empire/patch/generator/GitPatchGenerator.java
+
 	SVN日志增量私有配置部分	  
 		 1.SVN日志路径：对应SVN提交日志存放的本地路径；
 		   日志记录方式，提交SVN后控制台会输出提交日志，将其拷贝到.txt结尾的日志文件中保存起来，用于发版
