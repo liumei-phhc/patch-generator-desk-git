@@ -4,6 +4,8 @@
 - Author:aaron
 - [项目地址：https://gitee.com/hackempire/patch-generator-desk](https://gitee.com/hackempire/patch-generator-desk)
 - [empire团队地址：https://gitee.com/organizations/hackempire/](https://gitee.com/organizations/hackempire/)
+### 软件下载
+        可执行.exe文件以及使用的相关教程请到附件中下载！
 ### 软件介绍
 
 	本软件是empire团队打造的一款用于application/web项目增量打包的全自动发版部署工具。
