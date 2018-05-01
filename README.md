@@ -1,10 +1,9 @@
-# patch-generator-desk
+#  **patch-generator-desk** 【技术QQ群：456742016】
+
 项目增量补丁包神器：全自动web增量打包发版，支持git/svn，支持多模块项目。
-
-Author:aaron(QQ:592235961,QQ群:456742016)
-
-[项目地址：](https://gitee.com/hackempire/patch-generator-desk)
-[empire团队地址：](https://gitee.com/organizations/hackempire/)
+- Author:aaron
+- [项目地址：](https://gitee.com/hackempire/patch-generator-desk)
+- [empire团队地址：](https://gitee.com/organizations/hackempire/)
 #软件介绍
 	本软件是empire团队打造的一款用于application/web项目增量打包的全自动发版部署工具。
 #功能介绍：
