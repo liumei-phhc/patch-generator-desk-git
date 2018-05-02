@@ -5,7 +5,7 @@
 - [项目地址：https://gitee.com/hackempire/patch-generator-desk](https://gitee.com/hackempire/patch-generator-desk)
 - [empire团队地址：https://gitee.com/organizations/hackempire/](https://gitee.com/organizations/hackempire/)
 ### empire宣言
-- ###          打造帝国最强无敌武士套装！来吧！加入帝国军团，一起征服这个世界！ 
+- ###          打造帝国最强无敌武士套装！来吧！加入帝国军团，一起征服这个物欲横流世界！ 
 
 ### 软件下载
 
