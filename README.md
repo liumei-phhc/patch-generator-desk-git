@@ -24,7 +24,7 @@
 	4.SVN日志增打包;
 
 ### 开发工具
-- 	NetBeans IDE8.2、jdk1.8、maven3.5、HBuilder
+- 	NetBeans IDE8.2、jdk1.8、maven3.5、HBuilder、GIT
 
 ### 历史轨迹
 -     1.修复控制台无法显示操作日志的bug-----2018-05-01 18:48
