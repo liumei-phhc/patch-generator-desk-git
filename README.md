@@ -68,10 +68,14 @@
 		   日志记录方式，提交SVN后控制台会输出提交日志，将其拷贝到.txt结尾的日志文件中保存起来，用于发版
 		   内容实例：(注意日志需顶格记录)
 
+
+```
 commit -m "1.服务点评bug修复2.道路救援bug修复3.全屏报表(二阶)bug修复"      
     Sending        D:/SpringRooWorkSpace/ump20170420_chery_pc/src/main/webapp/WEB-INF/views/cheryreport/RegAndAuthResult.jsp
     Transmitting file data ...
     Committed revision 14471.
+```
+
 ### **相关项目** 
 
 1.  [emsite分布式开源系统生态圈](https://gitee.com/hackempire/emsite-parent)
