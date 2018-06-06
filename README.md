@@ -69,9 +69,9 @@
 
 
 ```
- GIT日志内容实例：(注意日志需顶格记录)
- patch-generator/src/main/java/com/empire/patch/generator/GeneratePatchExecutor.java
- patch-generator/src/main/java/com/empire/patch/generator/GitPatchGenerator.java
+GIT日志内容实例：(注意日志需顶格记录)
+patch-generator/src/main/java/com/empire/patch/generator/GeneratePatchExecutor.java
+patch-generator/src/main/java/com/empire/patch/generator/GitPatchGenerator.java
 ```
 ```
 SVN日志内容实例：(注意日志需顶格记录)
