@@ -61,20 +61,18 @@
 		   该路径或得方式可以通过右键点击项目-Team-show in history-视图中会显示提交的版本，选择需要发布的某个版本拷贝
                    右下角的本次版本的提交路径存入GIT提交日志即可。
  
-
-```
- GIT日志内容实例：(注意日志需顶格记录)
- patch-generator/src/main/java/com/empire/patch/generator/GeneratePatchExecutor.java
- patch-generator/src/main/java/com/empire/patch/generator/GitPatchGenerator.java
-```
-
-
 	SVN日志增量私有配置部分	  
 		 1.SVN日志路径：对应SVN提交日志存放的本地路径；
 		   日志记录方式，提交SVN后控制台会输出提交日志，将其拷贝到.txt结尾的日志文件中保存起来，用于发版
 		   
 
 
+
+```
+ GIT日志内容实例：(注意日志需顶格记录)
+ patch-generator/src/main/java/com/empire/patch/generator/GeneratePatchExecutor.java
+ patch-generator/src/main/java/com/empire/patch/generator/GitPatchGenerator.java
+```
 ```
 SVN日志内容实例：(注意日志需顶格记录)
 commit -m "1.服务点评bug修复2.道路救援bug修复3.全屏报表(二阶)bug修复"      
