@@ -1,5 +1,7 @@
 /**
- * Copyright &copy; 2018 <a href="https://gitee.com/hackempire/patch-generator-desk">patch-generator-desk</a> All rights reserved.
+ * Copyright &copy; 2018
+ * <a href="https://gitee.com/hackempire/patch-generator-desk">patch-generator-desk</a>
+ * All rights reserved.
  */
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -9,7 +11,11 @@
 package com.empire.patch.generator.desk;
 
 import com.empire.patch.generator.GeneratePatchExecutor;
+import com.empire.patch.generator.desk.Enum.AnalysisTypeEnum;
+import com.empire.patch.generator.desk.Enum.DependLevelEnum;
 import com.empire.patch.generator.desk.utils.DOMUtils;
+import com.empire.patch.generator.desk.utils.DateUtil;
+import com.empire.patch.generator.desk.utils.FileUtil;
 import com.empire.patch.generator.entity.PatchInfo;
 import com.empire.patch.generator.entity.ProjectInfo;
 import com.empire.patch.generator.entity.SourceMapper;
@@ -18,22 +24,37 @@ import com.empire.patch.generator.enums.GenTypeEnum;
 import com.empire.patch.generator.enums.ProjectTypeEnum;
 import com.empire.patch.generator.enums.VersionManagerTypeEnum;
 import com.empire.patch.generator.desk.utils.MainFrameConsoleUtil;
+import com.empire.patch.generator.desk.utils.StreamGobblerHandle;
 import com.empire.patch.generator.entity.GitProjectInfo;
 import com.empire.patch.generator.entity.ProjectReviseMapper;
 import java.awt.Dimension;
 import java.util.List;
 import java.awt.Toolkit;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Date;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JRadioButton;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -70,6 +91,8 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         GITLOGPROJECTTYPEbuttonGroup = new javax.swing.ButtonGroup();
         GITSERVERPROJECTTYPEbuttonGroup = new javax.swing.ButtonGroup();
         SVNSERVERPROJECTTYPEbuttonGroup = new javax.swing.ButtonGroup();
+        MVNPOMANALYSISbuttonGroup = new javax.swing.ButtonGroup();
+        MVNPOMDEPENDLEVELbuttonGroup = new javax.swing.ButtonGroup();
         PatchjTabbedPane = new javax.swing.JTabbedPane();
         GITSERVERjScrollPane = new javax.swing.JScrollPane();
         GITSERVERjPanel = new javax.swing.JPanel();
@@ -115,7 +138,6 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         SVNSERVERPROJECTMUTILjRadioButton = new javax.swing.JRadioButton();
         SVNSERVERVERSIONjLabel = new javax.swing.JLabel();
         SVNSERVERVERSIONSTARTjTextField = new javax.swing.JTextField();
-        SVNSERVERPWDjTextField = new javax.swing.JTextField();
         SVNSERVERTABELjScrollPane = new javax.swing.JScrollPane();
         SVNSERVERSOURCEMAPPERjTable = new javax.swing.JTable();
         SVNSERVERADDjButton = new javax.swing.JButton();
@@ -132,6 +154,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         SVNSERVERREVISEPATHjLabel = new javax.swing.JLabel();
         SVNSERVEREXCLUDEjTextField = new javax.swing.JTextField();
         SVNSERVERPROJECTCONFIGjButton = new javax.swing.JButton();
+        SVNSERVERPWDjPasswordField = new javax.swing.JPasswordField();
         GITLOGjScrollPane = new javax.swing.JScrollPane();
         GITLOGjPanel = new javax.swing.JPanel();
         GITLOGPROJECTNAMEjLabel = new javax.swing.JLabel();
@@ -178,6 +201,33 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         SVNLOGPROJECTMUTILjRadioButton = new javax.swing.JRadioButton();
         SVNLOGSAVECONFIGjButton = new javax.swing.JButton();
         SVNLOGPROJECTCONFIGjButton = new javax.swing.JButton();
+        MVNjScrollPane = new javax.swing.JScrollPane();
+        MVNPOMANALYSISjPanel = new javax.swing.JPanel();
+        MVNPOMNEWPATHjLabel = new javax.swing.JLabel();
+        MVNPOMNEWPATHjTextField = new javax.swing.JTextField();
+        MVNPOMANALYSISNAMEPROJECTNAMEjLabel = new javax.swing.JLabel();
+        MVNPOMANALYSISNAMEPROJECTNAMEjTextField = new javax.swing.JTextField();
+        MVNPOMANALYSISOUTPUTjLabel = new javax.swing.JLabel();
+        MVNPOMANALYSISOUTPUTjTextField = new javax.swing.JTextField();
+        MVNPOMOLDPATHjButton = new javax.swing.JButton();
+        MVNPOMANALYSISOUTPUTjButton = new javax.swing.JButton();
+        MVNPOMANALYSISOUTPACKjButton = new javax.swing.JButton();
+        MVNPOMCOMPLETEANALYSISjRadioButton = new javax.swing.JRadioButton();
+        MVNPOMDEPENDLEVELjLabel = new javax.swing.JLabel();
+        MVNPOMDIFFANALYSISjRadioButton = new javax.swing.JRadioButton();
+        MVNPOMANALYSISCONFIGjButton = new javax.swing.JButton();
+        MVNPOMANALYSISCTCONFIGjButton = new javax.swing.JButton();
+        MVNPOMANALYSISNAMEjTextField = new javax.swing.JTextField();
+        MVNPOMANALYSISNAMEjLabel = new javax.swing.JLabel();
+        MVNPOMOLDPATHjLabel = new javax.swing.JLabel();
+        MVNPOMOLDPATHjTextField = new javax.swing.JTextField();
+        MVNPOMNEWPATHjButton = new javax.swing.JButton();
+        MVNPOMANALYSISTYPEjLabel1 = new javax.swing.JLabel();
+        MVNPOMTESTjRadioButton = new javax.swing.JRadioButton();
+        MVNPOMSYSTEMjRadioButton = new javax.swing.JRadioButton();
+        MVNPOMCOMPILEjRadioButton = new javax.swing.JRadioButton();
+        MVNPOMRUNTIMEjRadioButton = new javax.swing.JRadioButton();
+        MVNPOMPROVIDEDjRadioButton = new javax.swing.JRadioButton();
         CONSOLEtextArea = new java.awt.TextArea();
         CONSOLEjLabel = new javax.swing.JLabel();
         globalConsolejScrollPane = new javax.swing.JScrollPane();
@@ -186,11 +236,12 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         PROJECTADDRESSjLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Empire全自动打包神器v2.0_Creat By Aaron【Q群456742016】");
+        setTitle("Empire全自动打包神器v3.0.1_Creat By Aaron【Q群456742016】");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setIconImage(Toolkit.getDefaultToolkit().getImage("favicon-20180430115456304.ico"));
         setLocation(new java.awt.Point(0, 0));
         setName("mainframe"); // NOI18N
+        setResizable(false);
         setSize(new java.awt.Dimension(300, 200));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -282,11 +333,6 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         GITSERVERSOURCEMAPPERjTable.setDragEnabled(true);
         GITSERVERSOURCEMAPPERjTable.setSelectionBackground(new java.awt.Color(204, 255, 204));
         GITSERVERSOURCEMAPPERjTable.setSelectionForeground(new java.awt.Color(0, 0, 0));
-        GITSERVERSOURCEMAPPERjTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                GITSERVERSOURCEMAPPERjTableMouseClicked(evt);
-            }
-        });
         GITSERVERTABELjScrollPane.setViewportView(GITSERVERSOURCEMAPPERjTable);
 
         GITSERVERjPanel.add(GITSERVERTABELjScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 200, 530, 110));
@@ -413,9 +459,6 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         SVNSERVERVERSIONSTARTjTextField.setFont(new java.awt.Font("幼圆", 0, 10)); // NOI18N
         SVNSERVERjPanel.add(SVNSERVERVERSIONSTARTjTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 170, 90, 20));
 
-        SVNSERVERPWDjTextField.setFont(new java.awt.Font("幼圆", 0, 10)); // NOI18N
-        SVNSERVERjPanel.add(SVNSERVERPWDjTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 200, 140, 20));
-
         SVNSERVERTABELjScrollPane.setAutoscrolls(true);
 
         SVNSERVERSOURCEMAPPERjTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -518,6 +561,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
             }
         });
         SVNSERVERjPanel.add(SVNSERVERPROJECTCONFIGjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, -1, 20));
+        SVNSERVERjPanel.add(SVNSERVERPWDjPasswordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 200, 140, 20));
 
         SVNSERVERjScrollPane.setViewportView(SVNSERVERjPanel);
 
@@ -808,6 +852,134 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         SVNLOGjScrollPane.getAccessibleContext().setAccessibleName("");
         SVNLOGjScrollPane.getAccessibleContext().setAccessibleDescription("");
 
+        MVNjScrollPane.setAutoscrolls(true);
+        MVNjScrollPane.setPreferredSize(new java.awt.Dimension(0, 0));
+
+        MVNPOMANALYSISjPanel.setAutoscrolls(true);
+        MVNPOMANALYSISjPanel.setPreferredSize(new java.awt.Dimension(0, 0));
+        MVNPOMANALYSISjPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        MVNPOMNEWPATHjLabel.setText("POM_NEW路径");
+        MVNPOMANALYSISjPanel.add(MVNPOMNEWPATHjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 90, 22));
+
+        MVNPOMNEWPATHjTextField.setFont(new java.awt.Font("幼圆", 0, 10)); // NOI18N
+        MVNPOMANALYSISjPanel.add(MVNPOMNEWPATHjTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 80, 420, 20));
+
+        MVNPOMANALYSISNAMEPROJECTNAMEjLabel.setText("项目名称");
+        MVNPOMANALYSISjPanel.add(MVNPOMANALYSISNAMEPROJECTNAMEjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 50, 20));
+
+        MVNPOMANALYSISNAMEPROJECTNAMEjTextField.setFont(new java.awt.Font("幼圆", 0, 10)); // NOI18N
+        MVNPOMANALYSISjPanel.add(MVNPOMANALYSISNAMEPROJECTNAMEjTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 50, 420, 20));
+
+        MVNPOMANALYSISOUTPUTjLabel.setText("输出目录");
+        MVNPOMANALYSISjPanel.add(MVNPOMANALYSISOUTPUTjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 50, 22));
+
+        MVNPOMANALYSISOUTPUTjTextField.setFont(new java.awt.Font("幼圆", 0, 10)); // NOI18N
+        MVNPOMANALYSISjPanel.add(MVNPOMANALYSISOUTPUTjTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 140, 420, 20));
+
+        MVNPOMOLDPATHjButton.setText("浏览");
+        MVNPOMOLDPATHjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MVNPOMOLDPATHjButtonActionPerformed(evt);
+            }
+        });
+        MVNPOMANALYSISjPanel.add(MVNPOMOLDPATHjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 110, -1, 20));
+
+        MVNPOMANALYSISOUTPUTjButton.setText("浏览");
+        MVNPOMANALYSISOUTPUTjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MVNPOMANALYSISOUTPUTjButtonActionPerformed(evt);
+            }
+        });
+        MVNPOMANALYSISjPanel.add(MVNPOMANALYSISOUTPUTjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 140, -1, 20));
+
+        MVNPOMANALYSISOUTPACKjButton.setText("打包");
+        MVNPOMANALYSISOUTPACKjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MVNPOMANALYSISOUTPACKjButtonActionPerformed(evt);
+            }
+        });
+        MVNPOMANALYSISjPanel.add(MVNPOMANALYSISOUTPACKjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 200, -1, 20));
+
+        MVNPOMANALYSISbuttonGroup.add(MVNPOMCOMPLETEANALYSISjRadioButton);
+        MVNPOMCOMPLETEANALYSISjRadioButton.setSelected(true);
+        MVNPOMCOMPLETEANALYSISjRadioButton.setLabel("完全分析");
+        MVNPOMANALYSISjPanel.add(MVNPOMCOMPLETEANALYSISjRadioButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 170, 80, -1));
+
+        MVNPOMDEPENDLEVELjLabel.setText("依赖级别");
+        MVNPOMANALYSISjPanel.add(MVNPOMDEPENDLEVELjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 200, 70, 20));
+        MVNPOMDEPENDLEVELjLabel.getAccessibleContext().setAccessibleName("POM分析类型");
+
+        MVNPOMANALYSISbuttonGroup.add(MVNPOMDIFFANALYSISjRadioButton);
+        MVNPOMDIFFANALYSISjRadioButton.setText("差异分析");
+        MVNPOMANALYSISjPanel.add(MVNPOMDIFFANALYSISjRadioButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 170, 80, -1));
+        MVNPOMDIFFANALYSISjRadioButton.getAccessibleContext().setAccessibleName("完全分析");
+
+        MVNPOMANALYSISCONFIGjButton.setText("保存");
+        MVNPOMANALYSISCONFIGjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MVNPOMANALYSISCONFIGjButtonActionPerformed(evt);
+            }
+        });
+        MVNPOMANALYSISjPanel.add(MVNPOMANALYSISCONFIGjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 170, -1, 20));
+
+        MVNPOMANALYSISCTCONFIGjButton.setText("配置");
+        MVNPOMANALYSISCTCONFIGjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MVNPOMANALYSISCTCONFIGjButtonActionPerformed(evt);
+            }
+        });
+        MVNPOMANALYSISjPanel.add(MVNPOMANALYSISCTCONFIGjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, -1, 20));
+
+        MVNPOMANALYSISNAMEjTextField.setFont(new java.awt.Font("幼圆", 0, 10)); // NOI18N
+        MVNPOMANALYSISjPanel.add(MVNPOMANALYSISNAMEjTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 20, 420, 20));
+
+        MVNPOMANALYSISNAMEjLabel.setText("分析名称");
+        MVNPOMANALYSISjPanel.add(MVNPOMANALYSISNAMEjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 50, 20));
+
+        MVNPOMOLDPATHjLabel.setText("POM_OLD路径");
+        MVNPOMANALYSISjPanel.add(MVNPOMOLDPATHjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 90, 20));
+
+        MVNPOMOLDPATHjTextField.setFont(new java.awt.Font("幼圆", 0, 10)); // NOI18N
+        MVNPOMANALYSISjPanel.add(MVNPOMOLDPATHjTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 110, 420, 20));
+
+        MVNPOMNEWPATHjButton.setText("浏览");
+        MVNPOMNEWPATHjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MVNPOMNEWPATHjButtonActionPerformed(evt);
+            }
+        });
+        MVNPOMANALYSISjPanel.add(MVNPOMNEWPATHjButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 80, -1, 20));
+
+        MVNPOMANALYSISTYPEjLabel1.setText("分析类型");
+        MVNPOMANALYSISjPanel.add(MVNPOMANALYSISTYPEjLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 70, 20));
+
+        MVNPOMDEPENDLEVELbuttonGroup.add(MVNPOMTESTjRadioButton);
+        MVNPOMTESTjRadioButton.setText("test");
+        MVNPOMANALYSISjPanel.add(MVNPOMTESTjRadioButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 200, 60, -1));
+
+        MVNPOMDEPENDLEVELbuttonGroup.add(MVNPOMSYSTEMjRadioButton);
+        MVNPOMSYSTEMjRadioButton.setText("system");
+        MVNPOMSYSTEMjRadioButton.setEnabled(false);
+        MVNPOMANALYSISjPanel.add(MVNPOMSYSTEMjRadioButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 200, 80, -1));
+
+        MVNPOMDEPENDLEVELbuttonGroup.add(MVNPOMCOMPILEjRadioButton);
+        MVNPOMCOMPILEjRadioButton.setSelected(true);
+        MVNPOMCOMPILEjRadioButton.setText("compile");
+        MVNPOMANALYSISjPanel.add(MVNPOMCOMPILEjRadioButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 200, 80, -1));
+
+        MVNPOMDEPENDLEVELbuttonGroup.add(MVNPOMRUNTIMEjRadioButton);
+        MVNPOMRUNTIMEjRadioButton.setText("runtime");
+        MVNPOMANALYSISjPanel.add(MVNPOMRUNTIMEjRadioButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 200, 80, -1));
+
+        MVNPOMDEPENDLEVELbuttonGroup.add(MVNPOMPROVIDEDjRadioButton);
+        MVNPOMPROVIDEDjRadioButton.setText("provided");
+        MVNPOMANALYSISjPanel.add(MVNPOMPROVIDEDjRadioButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 200, 80, -1));
+
+        MVNjScrollPane.setViewportView(MVNPOMANALYSISjPanel);
+
+        PatchjTabbedPane.addTab("POM依赖分析", null, MVNjScrollPane, "");
+
         getContentPane().add(PatchjTabbedPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 390));
         PatchjTabbedPane.getAccessibleContext().setAccessibleName("");
         PatchjTabbedPane.getAccessibleContext().setAccessibleDescription("");
@@ -908,8 +1080,9 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void SVNLOGOUTPUTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGOUTPUTjButtonActionPerformed
+        String oldPomPath = SVNLOGOUTPUTjTextField.getText();
         //设置只能选择目录
-        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNLOGOUTPUTjTextField, null, null);
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNLOGOUTPUTjTextField, oldPomPath, null);
     }//GEN-LAST:event_SVNLOGOUTPUTjButtonActionPerformed
     /**
      * SVN日志增量-服务器项目URL路径选择
@@ -917,7 +1090,8 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void SVNLOGPATHjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGPATHjButtonActionPerformed
-        doJfileChooseAction(JFileChooser.FILES_ONLY, SVNLOGPATHjTextField, null, null);
+        String oldPomPath = SVNLOGPATHjTextField.getText();
+        doJfileChooseAction(JFileChooser.FILES_ONLY, SVNLOGPATHjTextField, oldPomPath, null);
     }//GEN-LAST:event_SVNLOGPATHjButtonActionPerformed
     /**
      * SVN日志增量项目本地路径选择
@@ -925,7 +1099,8 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void SVNLOGPROJECTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGPROJECTjButtonActionPerformed
-        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNLOGPROJECTPATHjTextField, null, null);
+        String oldPomPath = SVNLOGPROJECTPATHjTextField.getText();
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNLOGPROJECTPATHjTextField, oldPomPath, null);
     }//GEN-LAST:event_SVNLOGPROJECTjButtonActionPerformed
 
     private void SVNLOGSOURCEMAPPERjTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SVNLOGSOURCEMAPPERjTableMouseClicked
@@ -963,8 +1138,12 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         if (SVNLOGPROJECTMUTILjRadioButton.isSelected()) {
             projectType = ProjectTypeEnum.MULTIMODULE;
         }
-        svnLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
-
+        String oldConfig = svnLogProjectConfig;
+        if (StringUtils.isNotBlank(svnLogProjectConfig)) {
+            svnLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, svnLogProjectConfig, "xml");
+        } else {
+            svnLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+        }
         if (svnLogProjectConfig != null) {
             try {
                 //DocumentHelper提供了创建Document对象的方法 
@@ -1019,7 +1198,9 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                 LOGGER.error("SVN日志增量保存配置文件异常", e);
             }
         }
-
+        if (StringUtils.isBlank(svnLogProjectConfig)) {
+            svnLogProjectConfig = oldConfig;
+        }
     }//GEN-LAST:event_SVNLOGSAVECONFIGjButtonActionPerformed
     /**
      * GIT日志增量项目本地路径选择
@@ -1028,7 +1209,8 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      */
     private void GITLOGPROJECTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGPROJECTjButtonActionPerformed
         // TODO add your handling code here:
-        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITLOGPROJECTPATHjTextField, null, null);
+        String oldPomPath = GITLOGPROJECTPATHjTextField.getText();
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITLOGPROJECTPATHjTextField, oldPomPath, null);
     }//GEN-LAST:event_GITLOGPROJECTjButtonActionPerformed
     /**
      * GIT日志增量-本地记录的日志文件
@@ -1036,8 +1218,9 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void GITLOGPATHjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGPATHjButtonActionPerformed
+        String oldPomPath = GITLOGPATHjTextField.getText();
         // 设置智能选择文件
-        doJfileChooseAction(JFileChooser.FILES_ONLY, GITLOGPATHjTextField, null, "txt");
+        doJfileChooseAction(JFileChooser.FILES_ONLY, GITLOGPATHjTextField, oldPomPath, "txt");
     }//GEN-LAST:event_GITLOGPATHjButtonActionPerformed
     /**
      * GIT日志增量-增量包输出目录选择
@@ -1045,7 +1228,8 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void GITLOGOUTPUTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGOUTPUTjButtonActionPerformed
-        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITLOGOUTPUTjTextField, null, null);
+        String oldPomPath = GITLOGOUTPUTjTextField.getText();
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITLOGOUTPUTjTextField, oldPomPath, null);
     }//GEN-LAST:event_GITLOGOUTPUTjButtonActionPerformed
     private void GITLOGSOURCEMAPPERjTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GITLOGSOURCEMAPPERjTableMouseClicked
         // TODO add your handling code here:
@@ -1095,8 +1279,12 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         if (GITLOGPROJECTMUTILjRadioButton.isSelected()) {
             projectType = ProjectTypeEnum.MULTIMODULE;
         }
-        gitLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
-
+        String oldConfig = gitLogProjectConfig;
+        if (StringUtils.isNotBlank(gitLogProjectConfig)) {
+            gitLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, gitLogProjectConfig, "xml");
+        } else {
+            gitLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+        }
         if (gitLogProjectConfig != null) {
             try {
                 //DocumentHelper提供了创建Document对象的方法 
@@ -1150,6 +1338,9 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
             } catch (IOException e) {
                 LOGGER.error("GIT日志增量保存配置文件异常", e);
             }
+        }
+        if (StringUtils.isBlank(gitLogProjectConfig)) {
+            gitLogProjectConfig = oldConfig;
         }
     }//GEN-LAST:event_GITLOGSAVECONFIGjButtonActionPerformed
     /**
@@ -1209,8 +1400,9 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void GITSERVERPROJECTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVERPROJECTjButtonActionPerformed
+        String oldPomPath = GITSERVERPROJECTPATHjTextField.getText();
         //设置只能选择目录
-        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITSERVERPROJECTPATHjTextField, null, null);
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITSERVERPROJECTPATHjTextField, oldPomPath, null);
     }//GEN-LAST:event_GITSERVERPROJECTjButtonActionPerformed
     /**
      * GIT服务器增量项目本地.git文件夹目录路径选择
@@ -1218,8 +1410,9 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void GITSERVERPATHjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVERPATHjButtonActionPerformed
+        String oldPomPath = GITSERVERPATHjTextField.getText();
         //设置只能选择目录
-        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITSERVERPATHjTextField, null, null);
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITSERVERPATHjTextField, oldPomPath, null);
     }//GEN-LAST:event_GITSERVERPATHjButtonActionPerformed
     /**
      * GIT服务器增量输出目录选择
@@ -1227,13 +1420,10 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void GITSERVEROUTPUTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVEROUTPUTjButtonActionPerformed
+        String oldPomPath = GITSERVEROUTPUTjTextField.getText();
         //设置只能选择目录
-        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITSERVEROUTPUTjTextField, null, null);
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, GITSERVEROUTPUTjTextField, oldPomPath, null);
     }//GEN-LAST:event_GITSERVEROUTPUTjButtonActionPerformed
-
-    private void GITSERVERSOURCEMAPPERjTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GITSERVERSOURCEMAPPERjTableMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_GITSERVERSOURCEMAPPERjTableMouseClicked
     /**
      * GIT服务器增量映射表添加一空行
      *
@@ -1252,7 +1442,8 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_GITSERVERDELjButtonActionPerformed
     /**
      * GIT服务器增量-保存配置文件
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITSERVERSAVECONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVERSAVECONFIGjButtonActionPerformed
         String projectName = GITSERVERPROJECTNAMEjTextField.getText();
@@ -1277,8 +1468,12 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         if (GITSERVERPROJECTMUTILjRadioButton.isSelected()) {
             projectType = ProjectTypeEnum.MULTIMODULE;
         }
-        gitServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
-
+        String oldConfig = gitServerProjectConfig;
+        if (StringUtils.isNotBlank(gitServerProjectConfig)) {
+            gitServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, gitLogProjectConfig, "xml");
+        } else {
+            gitServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+        }
         if (gitServerProjectConfig != null) {
             try {
                 //DocumentHelper提供了创建Document对象的方法 
@@ -1337,6 +1532,9 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                 LOGGER.error("GIT服务器增量保存配置文件异常", e);
             }
         }
+        if (StringUtils.isBlank(gitServerProjectConfig)) {
+            gitServerProjectConfig = oldConfig;
+        }
     }//GEN-LAST:event_GITSERVERSAVECONFIGjButtonActionPerformed
     /**
      * GIT服务器增量点击打包按钮执行打包事件
@@ -1392,7 +1590,8 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      */
     private void SVNSERVERPROJECTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNSERVERPROJECTjButtonActionPerformed
         // TODO add your handling code here:
-        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNSERVERPROJECTPATHjTextField, null, null);
+        String oldPomPath = SVNSERVERPROJECTPATHjTextField.getText();
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNSERVERPROJECTPATHjTextField, oldPomPath, null);
     }//GEN-LAST:event_SVNSERVERPROJECTjButtonActionPerformed
     /**
      * SVN服务器增量-增量包输出目录选择
@@ -1400,7 +1599,8 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void SVNSERVEROUTPUTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNSERVEROUTPUTjButtonActionPerformed
-        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNSERVEROUTPUTjTextField, null, null);
+        String oldPomPath = SVNSERVEROUTPUTjTextField.getText();
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, SVNSERVEROUTPUTjTextField, oldPomPath, null);
     }//GEN-LAST:event_SVNSERVEROUTPUTjButtonActionPerformed
     private void SVNSERVERSOURCEMAPPERjTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SVNSERVERSOURCEMAPPERjTableMouseClicked
         // TODO add your handling code here:
@@ -1436,9 +1636,9 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         String endVersion = SVNSERVERVERSIONENDjTextField.getText();
         String excludeVersion = SVNSERVEREXCLUDEjTextField.getText();
         String acount = SVNSERVERACOUNTjTextField.getText();
-        String pwd = SVNSERVERPWDjTextField.getText();
+        String pwd = new String(SVNSERVERPWDjPasswordField.getPassword());
         String reviseMapper = SVNSERVERREVISEjTextField.getText();
-        
+
         List<SourceMapper> sourceMappers = new ArrayList<>();
         DefaultTableModel sourceMapperModel = (DefaultTableModel) SVNSERVERSOURCEMAPPERjTable.getModel();
         int rowCount = sourceMapperModel.getRowCount();
@@ -1455,8 +1655,12 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         if (SVNSERVERPROJECTMUTILjRadioButton.isSelected()) {
             projectType = ProjectTypeEnum.MULTIMODULE;
         }
-        svnServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
-
+        String oldConfig = svnServerProjectConfig;
+        if (StringUtils.isNotBlank(svnServerProjectConfig)) {
+            svnServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, svnServerProjectConfig, "xml");
+        } else {
+            svnServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+        }
         if (svnServerProjectConfig != null) {
             try {
                 //DocumentHelper提供了创建Document对象的方法 
@@ -1523,7 +1727,9 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                 LOGGER.error("SVN服务器增量保存配置文件异常", e);
             }
         }
-        
+        if (StringUtils.isBlank(svnServerProjectConfig)) {
+            svnServerProjectConfig = oldConfig;
+        }
     }//GEN-LAST:event_SVNSERVERSAVECONFIGjButtonActionPerformed
     /**
      * SVN服务器增量-点击增量打包
@@ -1540,7 +1746,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         String endVersion = SVNSERVERVERSIONENDjTextField.getText();
         String excludeVersion = SVNSERVERREVISEjTextField.getText();
         String acount = SVNSERVERACOUNTjTextField.getText();
-        String pwd = SVNSERVERPWDjTextField.getText();
+        String pwd = new String(SVNSERVERPWDjPasswordField.getPassword());
         String reviseMapper = SVNSERVERREVISEjTextField.getText();
 
         List<SourceMapper> sourceMappers = new ArrayList<>();
@@ -1570,10 +1776,10 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         projectInfo.setVersionManagerTypeEnum(VersionManagerTypeEnum.SVN);
         projectInfo.setSourceMappers(sourceMappers);
         if (StringUtils.isNotBlank(reviseMapper)) {
-            String[] reviseArr=reviseMapper.split(":");
-            if(reviseArr.length==1){
+            String[] reviseArr = reviseMapper.split(":");
+            if (reviseArr.length == 1) {
                 projectInfo.setReviseMapper(new ProjectReviseMapper(reviseMapper, ""));
-            }else{
+            } else {
                 projectInfo.setReviseMapper(new ProjectReviseMapper(reviseArr[0], reviseArr[1]));
             }
         }
@@ -1595,8 +1801,9 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_SVNSERVEROUTPACKjButtonActionPerformed
 
     private void GITSERVERPROJECTCONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITSERVERPROJECTCONFIGjButtonActionPerformed
+        String oldConfig = gitServerProjectConfig;
         if (StringUtils.isNotBlank(gitServerProjectConfig)) {
-            gitServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, gitLogProjectConfig,"xml");
+            gitServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, gitLogProjectConfig, "xml");
         } else {
             gitServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
         }
@@ -1625,7 +1832,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                 GITSERVERVERSIONSTARTjTextField.setText(startVersion);
                 String endVersion = DOMUtils.getTextTrim(root, "end-version");
                 GITSERVERVERSIONENDjTextField.setText(endVersion);
-                
+
                 ((DefaultTableModel) GITSERVERSOURCEMAPPERjTable.getModel()).setRowCount(0);
                 Element sourceMappersElment = DOMUtils.getChildElement(root, "source-mappers");
                 if (sourceMappersElment != null) {
@@ -1641,19 +1848,23 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                     }
                 }
                 LOGGER.info("配置文件类型文件导入成功！");
-            }else{
+            } else {
                 LOGGER.error("配置文件类型文件gen-type、version-manager-type与当前类型不匹配！");
             }
-
+        }
+        if (StringUtils.isBlank(gitServerProjectConfig)) {
+            gitServerProjectConfig = oldConfig;
         }
     }//GEN-LAST:event_GITSERVERPROJECTCONFIGjButtonActionPerformed
     /**
      * SVN服务器增量-导入配置文件
-     * @param evt 
+     *
+     * @param evt
      */
     private void SVNSERVERPROJECTCONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNSERVERPROJECTCONFIGjButtonActionPerformed
+        String oldConfig = svnServerProjectConfig;
         if (StringUtils.isNotBlank(svnServerProjectConfig)) {
-            svnServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, svnServerProjectConfig,"xml");
+            svnServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, svnServerProjectConfig, "xml");
         } else {
             svnServerProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
         }
@@ -1673,10 +1884,10 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                 String acount = DOMUtils.getTextTrim(root, "svn-acount");
                 SVNSERVERACOUNTjTextField.setText(acount);
                 String pwd = DOMUtils.getTextTrim(root, "svn-pwd");
-                SVNSERVERPWDjTextField.setText(pwd);
+                SVNSERVERPWDjPasswordField.setText(pwd);
                 String excludeVersion = DOMUtils.getTextTrim(root, "exclude-version");
                 SVNSERVEREXCLUDEjTextField.setText(excludeVersion);
-                
+
                 String outputPath = DOMUtils.getTextTrim(root, "output-path");
                 SVNSERVEROUTPUTjTextField.setText(outputPath);
                 String projectType = DOMUtils.getTextTrim(root, "project-type");
@@ -1706,19 +1917,24 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                     }
                 }
                 LOGGER.info("配置文件类型文件导入成功！");
-            }else{
+            } else {
                 LOGGER.error("配置文件类型文件gen-type、version-manager-type与当前类型不匹配！");
             }
 
         }
+        if (StringUtils.isBlank(svnServerProjectConfig)) {
+            svnServerProjectConfig = oldConfig;
+        }
     }//GEN-LAST:event_SVNSERVERPROJECTCONFIGjButtonActionPerformed
     /**
      * git日志增量-导入配置文件
-     * @param evt 
+     *
+     * @param evt
      */
     private void GITLOGPROJECTCONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GITLOGPROJECTCONFIGjButtonActionPerformed
+        String oldConfig = gitLogProjectConfig;
         if (StringUtils.isNotBlank(gitLogProjectConfig)) {
-            gitLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, gitLogProjectConfig,"xml");
+            gitLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, gitLogProjectConfig, "xml");
         } else {
             gitLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
         }
@@ -1758,10 +1974,12 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                     }
                 }
                 LOGGER.info("配置文件类型文件导入成功！");
-            }else{
+            } else {
                 LOGGER.error("配置文件类型文件gen-type、version-manager-type与当前类型不匹配！");
             }
-
+        }
+        if (StringUtils.isBlank(gitLogProjectConfig)) {
+            gitLogProjectConfig = oldConfig;
         }
     }//GEN-LAST:event_GITLOGPROJECTCONFIGjButtonActionPerformed
     /**
@@ -1770,6 +1988,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void SVNLOGPROJECTCONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SVNLOGPROJECTCONFIGjButtonActionPerformed
+        String oldConfig = svnLogProjectConfig;
         if (StringUtils.isNotBlank(svnLogProjectConfig)) {
             svnLogProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, svnLogProjectConfig, "xml");
         } else {
@@ -1811,12 +2030,314 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                     }
                 }
                 LOGGER.info("配置文件类型文件导入成功！");
-            }else{
+            } else {
                 LOGGER.error("配置文件类型文件gen-type、version-manager-type与当前类型不匹配！");
             }
 
         }
+        if (StringUtils.isBlank(svnLogProjectConfig)) {
+            svnLogProjectConfig = oldConfig;
+        }
     }//GEN-LAST:event_SVNLOGPROJECTCONFIGjButtonActionPerformed
+    /**
+     * 选择MVN POM分析输出目录
+     *
+     * @param evt
+     */
+    private void MVNPOMANALYSISOUTPUTjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MVNPOMANALYSISOUTPUTjButtonActionPerformed
+        String mvnPomAnalysisOutput = MVNPOMANALYSISOUTPUTjTextField.getText();
+        doJfileChooseAction(JFileChooser.DIRECTORIES_ONLY, MVNPOMANALYSISOUTPUTjTextField, mvnPomAnalysisOutput, null);
+    }//GEN-LAST:event_MVNPOMANALYSISOUTPUTjButtonActionPerformed
+    /**
+     * MVN pom依赖分析打包
+     *
+     * @param evt
+     */
+    private void MVNPOMANALYSISOUTPACKjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MVNPOMANALYSISOUTPACKjButtonActionPerformed
+        String analysisName = MVNPOMANALYSISNAMEjTextField.getText();
+        String projectName = MVNPOMANALYSISNAMEPROJECTNAMEjTextField.getText();
+        String pomNewPath = MVNPOMNEWPATHjTextField.getText();
+        String pomOldPath = MVNPOMOLDPATHjTextField.getText();
+        String outputPath = MVNPOMANALYSISOUTPUTjTextField.getText();
+        if (StringUtils.isBlank(analysisName)) {
+            LOGGER.error("分析名称为空");
+            return;
+        }
+        if (StringUtils.isBlank(projectName)) {
+            LOGGER.error("项目名称为空");
+            return;
+        }
+        if (StringUtils.isBlank(pomNewPath)) {
+            LOGGER.error("POM_NEW路径为空");
+            return;
+        }
+        if (StringUtils.isBlank(pomOldPath)) {
+            LOGGER.error("POM_OLD路径为空");
+            return;
+        }
+        if (StringUtils.isBlank(outputPath)) {
+            LOGGER.warn("输出路径为空,依赖分析包将放在打包工具所在目录");
+        }
+        AnalysisTypeEnum analysisType = AnalysisTypeEnum.COMPLETEANALYSISMODULE;
+        if (MVNPOMDIFFANALYSISjRadioButton.isSelected()) {
+            analysisType = AnalysisTypeEnum.DIFFANALYSISMODULE;
+        }
+        DependLevelEnum dependLevelEnum = DependLevelEnum.COMPILE;
+        if (MVNPOMCOMPILEjRadioButton.isSelected()) {
+            dependLevelEnum = DependLevelEnum.COMPILE;
+        } else if (MVNPOMTESTjRadioButton.isSelected()) {
+            dependLevelEnum = DependLevelEnum.TEST;
+        } else if (MVNPOMRUNTIMEjRadioButton.isSelected()) {
+            dependLevelEnum = DependLevelEnum.RUNTIME;
+        } else if (MVNPOMPROVIDEDjRadioButton.isSelected()) {
+            dependLevelEnum = DependLevelEnum.PROVIDED;
+        } else {
+            dependLevelEnum = DependLevelEnum.SYSTEM;
+        }
+        String dependLevel = dependLevelEnum.name().toLowerCase();
+        //mvntest.bat D:\\SpringRooWorkSpace\\ump20170420_chery_pc E:\\apache-maven-3.5.3\\conf\\settings.xml E:\\mvntest\\lib
+        String userDir = System.getProperty("user.dir");
+        LOGGER.info("开始执行maven pom bat命令!工作目录：" + userDir);
+        String dateFormatStr = DateUtil.formatDateStr(DateUtil.SHORT_SECOND);
+        String FILE_SEPARATOR = System.getProperty("file.separator");
+        if (StringUtils.isBlank(outputPath)) {
+            outputPath = userDir;
+        }
+        LOGGER.info("请稍等片刻...");
+        outputPath = outputPath + FILE_SEPARATOR + projectName + FILE_SEPARATOR + analysisName + FILE_SEPARATOR + dateFormatStr + FILE_SEPARATOR + "pomlib";
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
+        //path.replace("/", FILE_SEPARATOR).replace("\\", FILE_SEPARATOR);
+        String newOutputPath = outputPath + FILE_SEPARATOR + "new";
+        //分析new pom
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    doMavenPomAnalysisAction(newOutputPath, pomNewPath, dependLevel, userDir);
+                    cyclicBarrier.await();
+                    LOGGER.info(Thread.currentThread().getName() + " is running...");
+                } catch (InterruptedException | BrokenBarrierException e) {
+                    LOGGER.error("new pom分析时出现错误", e);
+                }
+                LOGGER.info(Thread.currentThread().getName() + " is terminated.");
+            }
+        });
+        //分析old pom
+        String oldOutputPath = outputPath + FILE_SEPARATOR + "old";
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    doMavenPomAnalysisAction(oldOutputPath, pomOldPath, dependLevel, userDir);
+                    cyclicBarrier.await();
+                    LOGGER.info(Thread.currentThread().getName() + " is running...");
+                } catch (InterruptedException | BrokenBarrierException e) {
+                    LOGGER.error("old pom分析时出现错误", e);
+                }
+                LOGGER.info(Thread.currentThread().getName() + " is terminated.");
+            }
+        });
+         //分析差异
+        String diffOutputPath = outputPath + FILE_SEPARATOR + "diff";
+        if (AnalysisTypeEnum.DIFFANALYSISMODULE.name().equals(analysisType.name())) {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        doMavenPomAnalysisDiffAction(newOutputPath, oldOutputPath, diffOutputPath, FILE_SEPARATOR);
+                        cyclicBarrier.await();
+                        LOGGER.info(Thread.currentThread().getName() + " is running...");
+                    } catch (InterruptedException | BrokenBarrierException e) {
+                        LOGGER.error("old pom分析时出现错误", e);
+                    }
+                    LOGGER.info(Thread.currentThread().getName() + " is terminated.");
+                }
+            });
+        }
+        LOGGER.info("maven analysis doing.............");
+    }//GEN-LAST:event_MVNPOMANALYSISOUTPACKjButtonActionPerformed
+    /**
+     * MVN POM分析配置文件保存
+     *
+     * @param evt
+     */
+    private void MVNPOMANALYSISCONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MVNPOMANALYSISCONFIGjButtonActionPerformed
+        String analysisName = MVNPOMANALYSISNAMEjTextField.getText();
+        String projectName = MVNPOMANALYSISNAMEPROJECTNAMEjTextField.getText();
+        String pomNewPath = MVNPOMNEWPATHjTextField.getText();
+        String pomOldPath = MVNPOMOLDPATHjTextField.getText();
+        String outputPath = MVNPOMANALYSISOUTPUTjTextField.getText();
+        AnalysisTypeEnum analysisType = AnalysisTypeEnum.COMPLETEANALYSISMODULE;
+        if (MVNPOMDIFFANALYSISjRadioButton.isSelected()) {
+            analysisType = AnalysisTypeEnum.DIFFANALYSISMODULE;
+        }
+        DependLevelEnum dependLevelEnum = DependLevelEnum.COMPILE;
+        if (MVNPOMCOMPILEjRadioButton.isSelected()) {
+            dependLevelEnum = DependLevelEnum.COMPILE;
+        } else if (MVNPOMTESTjRadioButton.isSelected()) {
+            dependLevelEnum = DependLevelEnum.TEST;
+        } else if (MVNPOMRUNTIMEjRadioButton.isSelected()) {
+            dependLevelEnum = DependLevelEnum.RUNTIME;
+        } else if (MVNPOMPROVIDEDjRadioButton.isSelected()) {
+            dependLevelEnum = DependLevelEnum.PROVIDED;
+        } else {
+            dependLevelEnum = DependLevelEnum.SYSTEM;
+        }
+        String oldConfig = MvnPomAnalysisProjectConfig;
+        if (StringUtils.isNotBlank(MvnPomAnalysisProjectConfig)) {
+            MvnPomAnalysisProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, MvnPomAnalysisProjectConfig, "xml");
+        } else {
+            MvnPomAnalysisProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+        }
+        LOGGER.info(MvnPomAnalysisProjectConfig);
+        if (MvnPomAnalysisProjectConfig != null) {
+            XMLWriter xmlWriter = null;
+            OutputStreamWriter out = null;
+            BufferedWriter fileWriter = null;
+            try {
+                //DocumentHelper提供了创建Document对象的方法 
+                Document document = DocumentHelper.createDocument();
+                //添加节点信息 
+                Element rootElement = document.addElement("patch-config");
+                //这里可以继续添加子节点，也可以指定内容 
+                //rootElement.setText("这个是module标签的文本信息");
+                Element analysisNameElement = rootElement.addElement("analysis-name");
+                analysisNameElement.setText(analysisName);
+                Element projectNameElement = rootElement.addElement("project-name");
+                projectNameElement.setText(projectName);
+                Element pomNewPathElement = rootElement.addElement("pom-new-path");
+                pomNewPathElement.setText(pomNewPath);
+                Element pomOldPathElement = rootElement.addElement("pom-old-path");
+                pomOldPathElement.setText(pomOldPath);
+                Element outputPathElement = rootElement.addElement("output-path");
+                outputPathElement.setText(outputPath);
+                Element analysisTypeElement = rootElement.addElement("analysis-type");
+                analysisTypeElement.setText(analysisType.name());
+                Element dependLevelElement = rootElement.addElement("depend-level");
+                dependLevelElement.setText(dependLevelEnum.name());
+                //Writer fileWriter = new FileWriter(MvnPomAnalysisProjectConfig);
+                out = new OutputStreamWriter(new FileOutputStream(MvnPomAnalysisProjectConfig), "UTF-8");
+                fileWriter = new BufferedWriter(out);
+                //设置文件编码  
+                OutputFormat xmlFormat = new OutputFormat();
+                xmlFormat.setEncoding("UTF-8");
+                // 设置换行 
+                xmlFormat.setNewlines(true);
+                // 生成缩进 
+                xmlFormat.setIndent(true);
+                // 使用4个空格进行缩进, 可以兼容文本编辑器 
+                xmlFormat.setIndent("    ");
+                //dom4j提供了专门写入文件的对象XMLWriter 
+                xmlWriter = new XMLWriter(fileWriter, xmlFormat);
+                xmlWriter.write(document);
+                xmlWriter.flush();
+                LOGGER.info("MVN POM ANALYSIS保存配置文件保存成功！路径：{}", MvnPomAnalysisProjectConfig);
+            } catch (IOException e) {
+                LOGGER.error("MVN POM ANALYSIS保存配置文件异常", e);
+            } finally {
+                if (xmlWriter != null) {
+                    try {
+                        xmlWriter.close();
+                    } catch (IOException ex) {
+                        LOGGER.error("MVN POM ANALYSIS保存配置文件关闭流异常", ex);
+                    }
+                }
+                if (fileWriter != null) {
+                    try {
+                        fileWriter.close();
+                    } catch (IOException ex) {
+                        LOGGER.error("MVN POM ANALYSIS保存配置文件关闭流异常", ex);
+                    }
+                }
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (IOException ex) {
+                        LOGGER.error("MVN POM ANALYSIS保存配置文件关闭流异常", ex);
+                    }
+                }
+            }
+        }
+        if (StringUtils.isBlank(MvnPomAnalysisProjectConfig)) {
+            MvnPomAnalysisProjectConfig = oldConfig;
+        }
+    }//GEN-LAST:event_MVNPOMANALYSISCONFIGjButtonActionPerformed
+    /**
+     * 导入Maven pom依赖分析配置文件
+     *
+     * @param evt
+     */
+    private void MVNPOMANALYSISCTCONFIGjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MVNPOMANALYSISCTCONFIGjButtonActionPerformed
+        // TODO add your handling code here:
+        String oldConfig = MvnPomAnalysisProjectConfig;
+        if (StringUtils.isNotBlank(MvnPomAnalysisProjectConfig)) {
+            MvnPomAnalysisProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, MvnPomAnalysisProjectConfig, "xml");
+        } else {
+            MvnPomAnalysisProjectConfig = doJfileChooseAction(JFileChooser.FILES_ONLY, null, null, "xml");
+        }
+
+        LOGGER.info(MvnPomAnalysisProjectConfig);
+        if (StringUtils.isNotBlank(MvnPomAnalysisProjectConfig)) {
+            Document document = DOMUtils.getXMLByFilePath(MvnPomAnalysisProjectConfig);
+            Element root = document.getRootElement();
+            String analysisType = DOMUtils.getTextTrim(root, "analysis-type");
+            if (AnalysisTypeEnum.COMPLETEANALYSISMODULE.name().equals(analysisType) || AnalysisTypeEnum.DIFFANALYSISMODULE.name().equals(analysisType)) {
+                String analysisName = DOMUtils.getTextTrim(root, "analysis-name");
+                String projectName = DOMUtils.getTextTrim(root, "project-name");
+                String pomNewPath = DOMUtils.getTextTrim(root, "pom-new-path");
+                String pomOldPath = DOMUtils.getTextTrim(root, "pom-old-path");
+                String outputPath = DOMUtils.getTextTrim(root, "output-path");
+                String dependLevel = DOMUtils.getTextTrim(root, "depend-level");
+                MVNPOMANALYSISNAMEjTextField.setText(analysisName);
+                MVNPOMANALYSISNAMEPROJECTNAMEjTextField.setText(projectName);
+                MVNPOMNEWPATHjTextField.setText(pomNewPath);
+                MVNPOMOLDPATHjTextField.setText(pomOldPath);
+                MVNPOMANALYSISOUTPUTjTextField.setText(outputPath);
+                if (AnalysisTypeEnum.DIFFANALYSISMODULE.name().equals(analysisType)) {
+                    MVNPOMDIFFANALYSISjRadioButton.setSelected(true);
+                } else {
+                    MVNPOMCOMPLETEANALYSISjRadioButton.setSelected(true);
+                }
+                if (DependLevelEnum.COMPILE.name().equals(dependLevel)) {
+                    MVNPOMCOMPILEjRadioButton.setSelected(true);
+                } else if (DependLevelEnum.TEST.name().equals(dependLevel)) {
+                    MVNPOMTESTjRadioButton.setSelected(true);
+                } else if (DependLevelEnum.RUNTIME.name().equals(dependLevel)) {
+                    MVNPOMRUNTIMEjRadioButton.setSelected(true);
+                } else if (DependLevelEnum.PROVIDED.name().equals(dependLevel)) {
+                    MVNPOMPROVIDEDjRadioButton.setSelected(true);
+                } else {
+                    MVNPOMSYSTEMjRadioButton.setSelected(true);
+                }
+                LOGGER.info("配置文件类型文件导入成功！");
+            } else {
+                LOGGER.error("配置文件类型文件analysis-type与当前类型不匹配！");
+            }
+        }
+        if (StringUtils.isBlank(MvnPomAnalysisProjectConfig)) {
+            MvnPomAnalysisProjectConfig = oldConfig;
+        }
+    }//GEN-LAST:event_MVNPOMANALYSISCTCONFIGjButtonActionPerformed
+    /**
+     * 选择pom.xml老路径
+     *
+     * @param evt
+     */
+    private void MVNPOMOLDPATHjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MVNPOMOLDPATHjButtonActionPerformed
+        // TODO add your handling code here:
+        String oldPomPath = MVNPOMOLDPATHjTextField.getText();
+        doJfileChooseAction(JFileChooser.FILES_ONLY, MVNPOMOLDPATHjTextField, oldPomPath, "xml");
+    }//GEN-LAST:event_MVNPOMOLDPATHjButtonActionPerformed
+    /**
+     * 选择pom.xml新路径
+     *
+     * @param evt
+     */
+    private void MVNPOMNEWPATHjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MVNPOMNEWPATHjButtonActionPerformed
+        // TODO add your handling code here:
+        String newPomPath = MVNPOMNEWPATHjTextField.getText();
+        doJfileChooseAction(JFileChooser.FILES_ONLY, MVNPOMNEWPATHjTextField, newPomPath, "xml");
+    }//GEN-LAST:event_MVNPOMNEWPATHjButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1844,7 +2365,11 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
                 JFrame mainJFrame = new GeneratorMainJFrame();
                 MainFrameConsoleUtil.initConsole(((GeneratorMainJFrame) mainJFrame).CONSOLEtextArea, ((GeneratorMainJFrame) mainJFrame).globalConsolejTextPane);
                 Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-                mainJFrame.setIconImage(Toolkit.getDefaultToolkit().getImage("favicon-20180430115456304.ico"));
+                //设置软件图标
+                URL url = GeneratorMainJFrame.class.getResource("/patch_desk.png");
+                ImageIcon icon = new ImageIcon(url);
+                //mainJFrame.setIconImage(Toolkit.getDefaultToolkit().getImage("patch_desk.png"));
+                mainJFrame.setIconImage(icon.getImage());
                 mainJFrame.setLocation((screen.width - mainJFrame.getSize().width) / 2, (screen.height - mainJFrame.getSize().height) / 2);//使启动窗口居中显示
                 mainJFrame.setVisible(true);
             }
@@ -1894,7 +2419,10 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private String svnServerProjectConfig = null;
     private String gitLogProjectConfig = null;
     private String gitServerProjectConfig = null;
-    
+    private String MvnPomAnalysisProjectConfig = null;
+    private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel CONSOLEjLabel;
     private java.awt.TextArea CONSOLEtextArea;
@@ -1950,6 +2478,35 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private javax.swing.JLabel GITSERVERVERSIONjLabel;
     private javax.swing.JPanel GITSERVERjPanel;
     private javax.swing.JScrollPane GITSERVERjScrollPane;
+    private javax.swing.JButton MVNPOMANALYSISCONFIGjButton;
+    private javax.swing.JButton MVNPOMANALYSISCTCONFIGjButton;
+    private javax.swing.JLabel MVNPOMANALYSISNAMEPROJECTNAMEjLabel;
+    private javax.swing.JTextField MVNPOMANALYSISNAMEPROJECTNAMEjTextField;
+    private javax.swing.JLabel MVNPOMANALYSISNAMEjLabel;
+    private javax.swing.JTextField MVNPOMANALYSISNAMEjTextField;
+    private javax.swing.JButton MVNPOMANALYSISOUTPACKjButton;
+    private javax.swing.JButton MVNPOMANALYSISOUTPUTjButton;
+    private javax.swing.JLabel MVNPOMANALYSISOUTPUTjLabel;
+    private javax.swing.JTextField MVNPOMANALYSISOUTPUTjTextField;
+    private javax.swing.JLabel MVNPOMANALYSISTYPEjLabel1;
+    private javax.swing.ButtonGroup MVNPOMANALYSISbuttonGroup;
+    private javax.swing.JPanel MVNPOMANALYSISjPanel;
+    private javax.swing.JRadioButton MVNPOMCOMPILEjRadioButton;
+    private javax.swing.JRadioButton MVNPOMCOMPLETEANALYSISjRadioButton;
+    private javax.swing.ButtonGroup MVNPOMDEPENDLEVELbuttonGroup;
+    private javax.swing.JLabel MVNPOMDEPENDLEVELjLabel;
+    private javax.swing.JRadioButton MVNPOMDIFFANALYSISjRadioButton;
+    private javax.swing.JButton MVNPOMNEWPATHjButton;
+    private javax.swing.JLabel MVNPOMNEWPATHjLabel;
+    private javax.swing.JTextField MVNPOMNEWPATHjTextField;
+    private javax.swing.JButton MVNPOMOLDPATHjButton;
+    private javax.swing.JLabel MVNPOMOLDPATHjLabel;
+    private javax.swing.JTextField MVNPOMOLDPATHjTextField;
+    private javax.swing.JRadioButton MVNPOMPROVIDEDjRadioButton;
+    private javax.swing.JRadioButton MVNPOMRUNTIMEjRadioButton;
+    private javax.swing.JRadioButton MVNPOMSYSTEMjRadioButton;
+    private javax.swing.JRadioButton MVNPOMTESTjRadioButton;
+    private javax.swing.JScrollPane MVNjScrollPane;
     private javax.swing.JLabel PROJECTADDRESSjLabel;
     private javax.swing.JTabbedPane PatchjTabbedPane;
     private javax.swing.JButton SVNLOGADDjButton;
@@ -1999,7 +2556,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private javax.swing.JButton SVNSERVERPROJECTjButton;
     private javax.swing.JLabel SVNSERVERPROJECTjLabel;
     private javax.swing.JLabel SVNSERVERPWDjLabel;
-    private javax.swing.JTextField SVNSERVERPWDjTextField;
+    private javax.swing.JPasswordField SVNSERVERPWDjPasswordField;
     private javax.swing.JLabel SVNSERVERREVISEPATHjLabel;
     private javax.swing.JTextField SVNSERVERREVISEjTextField;
     private javax.swing.JButton SVNSERVERSAVECONFIGjButton;
@@ -2015,6 +2572,150 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane globalConsolejScrollPane;
     private javax.swing.JTextPane globalConsolejTextPane;
     // End of variables declaration//GEN-END:variables
+    /**
+     * maven pom analysis依赖包差异分析
+     *
+     * @param newOutputPath
+     * @param oldOutputPath
+     * @param diffOutputPath
+     * @param fileSeparator
+     */
+    private void doMavenPomAnalysisDiffAction(String newOutputPath, String oldOutputPath, String diffOutputPath, String fileSeparator) {
+        File diffOutputPathFile = new File(diffOutputPath);
+        if (!diffOutputPathFile.exists()) {
+            diffOutputPathFile.mkdirs();
+        }
+        File diffAddOutputPathFile = new File(diffOutputPath + fileSeparator + "add");
+        File diffRemoveOutputPathFile = new File(diffOutputPath + fileSeparator + "remove");
+        if (!diffAddOutputPathFile.exists()) {
+            diffAddOutputPathFile.mkdirs();
+        }
+        if (!diffRemoveOutputPathFile.exists()) {
+            diffRemoveOutputPathFile.mkdirs();
+        }
+        File newFsPath = new File(newOutputPath);
+        File[] newFsArr = newFsPath.listFiles();
+        ArrayList<String> newFsList = new ArrayList<String>();
+        for (File f : newFsArr) {
+            newFsList.add(f.getName());
+        }
+        File oldFsPath = new File(oldOutputPath);
+        File[] oldFsArr = oldFsPath.listFiles();
+        ArrayList<String> oldFsList = new ArrayList<String>();
+        for (File f : oldFsArr) {
+            oldFsList.add(f.getName());
+        }
+        // 集合相减  
+        ArrayList<String> addSubtractList = (ArrayList<String>) CollectionUtils.subtract(newFsList, oldFsList);
+        // 集合相减  
+        ArrayList<String> minusSubtractList = (ArrayList<String>) CollectionUtils.subtract(oldFsList, newFsList);
+        for (int i = 0; i < newFsArr.length; ++i) {
+            if (addSubtractList.contains(newFsArr[i].getName())) {
+                if (newFsArr[i].isFile()) {
+                    final File newFsFile = newFsArr[i];
+                    String name = newFsFile.getName();
+                    final File newFile = new File(diffOutputPath + fileSeparator + "add" + fileSeparator + name);
+                    if (!newFile.exists()) {
+                        try {
+                            System.out.println(newFile);
+                            newFile.createNewFile();
+                            executor.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        FileUtil.fileChannelCopy(newFsFile, newFile);
+                                    } catch (IOException e) {
+                                        LOGGER.error("MVN POM依赖差异分析打包流信息处理add异常", e);
+                                    }
+                                }
+                            });
+
+                        } catch (IOException e) {
+                            LOGGER.error("MVN POM依赖差异分析打包流信息处理add异常", e);
+                        }
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < oldFsArr.length; ++i) {
+            if (minusSubtractList.contains(oldFsArr[i].getName())) {
+                if (oldFsArr[i].isFile()) {
+                    final File oldFsFile = oldFsArr[i];
+                    String name = oldFsFile.getName();
+                    final File newFile = new File(diffOutputPath + fileSeparator + "remove" + fileSeparator + name);
+                    if (!newFile.exists()) {
+                        try {
+                            System.out.println(newFile);
+                            newFile.createNewFile();
+                            executor.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        FileUtil.fileChannelCopy(oldFsFile, newFile);
+                                    } catch (IOException e) {
+                                        LOGGER.error("MVN POM依赖差异分析打包流信息处理remove异常", e);
+                                    }
+                                }
+                            });
+                        } catch (IOException e) {
+                            LOGGER.error("MVN POM依赖差异分析打包流信息处理remove异常", e);
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    /**
+     * maven pom analysis依赖包分析
+     *
+     * @param outputPath
+     * @param pomPath
+     * @param dependLevel
+     * @param userDir
+     */
+    private void doMavenPomAnalysisAction(String outputPath, String pomPath, String dependLevel, String userDir) {
+        Process child = null;
+        InputStream in = null;
+        try {
+            child = child = Runtime.getRuntime().exec(
+                    "cmd /c  start /b " + userDir + "\\mvn_analysis.bat  " + pomPath + "  " + outputPath + "  " + dependLevel);
+            StreamGobblerHandle errorGobbler = new StreamGobblerHandle(child.getErrorStream(), "Error");
+            StreamGobblerHandle outputGobbler = new StreamGobblerHandle(child.getInputStream(), "Output");
+            List<Future> tasks = new ArrayList<Future>();
+            tasks.add(executor.submit(errorGobbler));
+            tasks.add(executor.submit(outputGobbler));
+            for (Future task : tasks) {
+                try {
+                    if (task.get() != null) {
+                    }
+                } catch (InterruptedException | ExecutionException ex) {
+                    LOGGER.error("MVN POM依赖分析打包流信息处理异常", ex);
+                }
+            }
+            child.waitFor();
+            int i = child.exitValue();
+            if (i == 0) {
+                LOGGER.info("执行maven pom bat命令完成!");
+            } else {
+                LOGGER.info("执行maven pom bat命令失败!");
+            }
+        } catch (IOException | InterruptedException ex) {
+            LOGGER.error("MVN POM依赖分析打包异常", ex);
+        } finally {
+            if (child != null) {
+                //child.destroy();  //销毁子进程
+            }
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ex) {
+                    LOGGER.error("关闭文件流异常", ex);
+                }
+            }
+        }
+    }
 }
 
 class FileSuffixFilter extends FileFilter {
@@ -2032,9 +2733,13 @@ class FileSuffixFilter extends FileFilter {
     @Override
     public boolean accept(File f) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        String fileName = f.getName();
-        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
-        return fileSuffix.equals(suffix);
+        boolean result = true;
+        if (!f.isDirectory()) {
+            String fileName = f.getName();
+            String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+            result = fileSuffix.equals(suffix);
+        }
+        return result;
     }
 
     @Override
