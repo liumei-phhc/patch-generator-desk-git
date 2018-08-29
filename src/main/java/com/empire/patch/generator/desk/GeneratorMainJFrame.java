@@ -52,6 +52,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JRadioButton;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 import org.apache.commons.collections.CollectionUtils;
@@ -236,7 +238,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         PROJECTADDRESSjLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Empire全自动打包神器v3.0.1_Creat By Aaron【Q群456742016】");
+        setTitle("Empire全自动打包神器v3.1.0_Creat By Aaron【Q群456742016】");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setIconImage(Toolkit.getDefaultToolkit().getImage("favicon-20180430115456304.ico"));
         setLocation(new java.awt.Point(0, 0));
@@ -2105,56 +2107,53 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         }
         LOGGER.info("请稍等片刻...");
         outputPath = outputPath + FILE_SEPARATOR + projectName + FILE_SEPARATOR + analysisName + FILE_SEPARATOR + dateFormatStr + FILE_SEPARATOR + "pomlib";
-        CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
-        //path.replace("/", FILE_SEPARATOR).replace("\\", FILE_SEPARATOR);
         String newOutputPath = outputPath + FILE_SEPARATOR + "new";
+        String oldOutputPath = outputPath + FILE_SEPARATOR + "old";
+        String diffOutputPath = outputPath + FILE_SEPARATOR + "diff";
+        final AnalysisTypeEnum analysisTypeClone = analysisType;
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(2, new Runnable() {
+            @Override
+            public void run() {
+                if (AnalysisTypeEnum.DIFFANALYSISMODULE.name().equals(analysisTypeClone.name())) {
+                    LOGGER.info("POM依赖差异分析线程：" + Thread.currentThread().getName() + " is running...");
+                    doMavenPomAnalysisDiffAction(newOutputPath, oldOutputPath, diffOutputPath, FILE_SEPARATOR);
+                    LOGGER.info("POM依赖差异分析线程：" + Thread.currentThread().getName() + " is terminated.");
+                }
+
+            }
+        });
+        LOGGER.info("maven analysis doing.............");
+        //path.replace("/", FILE_SEPARATOR).replace("\\", FILE_SEPARATOR);
         //分析new pom
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
+                    LOGGER.info("new pom分析线程：" + Thread.currentThread().getName() + " is running...");
                     doMavenPomAnalysisAction(newOutputPath, pomNewPath, dependLevel, userDir);
+                    LOGGER.info("new pom分析线程：" + Thread.currentThread().getName() + " is terminated.");
                     cyclicBarrier.await();
-                    LOGGER.info(Thread.currentThread().getName() + " is running...");
+
                 } catch (InterruptedException | BrokenBarrierException e) {
                     LOGGER.error("new pom分析时出现错误", e);
                 }
-                LOGGER.info(Thread.currentThread().getName() + " is terminated.");
             }
         });
         //分析old pom
-        String oldOutputPath = outputPath + FILE_SEPARATOR + "old";
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
+                    LOGGER.info("old pom分析线程：" + Thread.currentThread().getName() + " is running...");
                     doMavenPomAnalysisAction(oldOutputPath, pomOldPath, dependLevel, userDir);
+                    LOGGER.info("old pom分析线程：" + Thread.currentThread().getName() + " is terminated.");
                     cyclicBarrier.await();
-                    LOGGER.info(Thread.currentThread().getName() + " is running...");
                 } catch (InterruptedException | BrokenBarrierException e) {
                     LOGGER.error("old pom分析时出现错误", e);
                 }
-                LOGGER.info(Thread.currentThread().getName() + " is terminated.");
+
             }
         });
-         //分析差异
-        String diffOutputPath = outputPath + FILE_SEPARATOR + "diff";
-        if (AnalysisTypeEnum.DIFFANALYSISMODULE.name().equals(analysisType.name())) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        doMavenPomAnalysisDiffAction(newOutputPath, oldOutputPath, diffOutputPath, FILE_SEPARATOR);
-                        cyclicBarrier.await();
-                        LOGGER.info(Thread.currentThread().getName() + " is running...");
-                    } catch (InterruptedException | BrokenBarrierException e) {
-                        LOGGER.error("old pom分析时出现错误", e);
-                    }
-                    LOGGER.info(Thread.currentThread().getName() + " is terminated.");
-                }
-            });
-        }
-        LOGGER.info("maven analysis doing.............");
     }//GEN-LAST:event_MVNPOMANALYSISOUTPACKjButtonActionPerformed
     /**
      * MVN POM分析配置文件保存
