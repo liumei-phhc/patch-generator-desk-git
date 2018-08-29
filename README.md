@@ -27,7 +27,7 @@
 	2.GIT日志增量打包;
 	3.SVN服务器增量打包;
 	4.SVN日志增打包;
-        5.pom依赖分析（增量|全量）;
+	5.pom依赖分析（增量|全量）;
 
 ### 开发工具
 - 	NetBeans IDE8.2、jdk1.8、maven3.5、HBuilder、GIT
