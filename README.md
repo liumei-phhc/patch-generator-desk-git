@@ -11,7 +11,7 @@
 
 ### 软件.exe文件下载
 
-- ###          方式一：附件中下载！
+- ###          方式一：附件中下载！[立即下载](http://https://gitee.com/hackempire/patch-generator-desk/attach_files)
 - ###          方式二：技术QQ群中下载！
 ### 软件介绍
 
