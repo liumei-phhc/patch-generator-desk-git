@@ -49,8 +49,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -238,7 +240,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         PROJECTADDRESSjLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Empire全自动打包神器v3.1.0_Creat By Aaron【Q群456742016】");
+        setTitle("Empire全自动打包神器v3.2.0_Creat By Aaron【Q群456742016】");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setIconImage(Toolkit.getDefaultToolkit().getImage("favicon-20180430115456304.ico"));
         setLocation(new java.awt.Point(0, 0));
@@ -1746,7 +1748,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         String outputPath = SVNSERVEROUTPUTjTextField.getText();
         String startVersion = SVNSERVERVERSIONSTARTjTextField.getText();
         String endVersion = SVNSERVERVERSIONENDjTextField.getText();
-        String excludeVersion = SVNSERVERREVISEjTextField.getText();
+        String excludeVersion = SVNSERVEREXCLUDEjTextField.getText();
         String acount = SVNSERVERACOUNTjTextField.getText();
         String pwd = new String(SVNSERVERPWDjPasswordField.getPassword());
         String reviseMapper = SVNSERVERREVISEjTextField.getText();
@@ -2383,6 +2385,10 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private String doJfileChooseAction(int jFileChooserType, javax.swing.JTextField jTextField, String configPath, String fileSuffix) {
         globaljFileChooser.setFileSelectionMode(jFileChooserType);//只能选择目录
         globaljFileChooser.resetChoosableFileFilters();
+//        globaljFileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+       //globaljFileChooser.showDialog(new JLabel(), "选择");
+        globaljFileChooser.setApproveButtonText("保存");
+        globaljFileChooser.setDialogTitle("选择");
         if (StringUtils.isNotBlank(fileSuffix)) {
             globaljFileChooser.setFileFilter(new FileSuffixFilter(fileSuffix));
         }
@@ -2396,8 +2402,10 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         } else {
             globaljFileChooser.setSelectedFile(null);
         }
-
-        int i = globaljFileChooser.showOpenDialog(null);
+//int i = globaljFileChooser.showDialog(new JLabel("选择"), "保存");
+        //int i = globaljFileChooser.showOpenDialog(null);
+        int i = globaljFileChooser.showSaveDialog(this);
+       
         String path = null;
         if (i == JFileChooser.APPROVE_OPTION) { //打开文件
             path = globaljFileChooser.getSelectedFile().getAbsolutePath();
