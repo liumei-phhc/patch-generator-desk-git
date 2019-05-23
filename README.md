@@ -30,7 +30,7 @@
 	5.pom依赖分析（增量|全量）;
 
 ### 开发工具
-- 	NetBeans IDE8.2、jdk1.8、maven3.5、HBuilder、GIT
+- 	NetBeans IDE8.2、jdk1.8、maven3.5、HBuilder、GIT、exe4j、bat脚本
 
 ### 历史轨迹
 -     1.修复控制台无法显示操作日志的bug-----2018-05-01 18:48
