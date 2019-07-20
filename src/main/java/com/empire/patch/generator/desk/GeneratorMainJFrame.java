@@ -16,6 +16,7 @@ import com.empire.patch.generator.desk.Enum.DependLevelEnum;
 import com.empire.patch.generator.desk.utils.DOMUtils;
 import com.empire.patch.generator.desk.utils.DateUtil;
 import com.empire.patch.generator.desk.utils.FileUtil;
+import com.empire.patch.generator.desk.utils.HttpUtil;
 import com.empire.patch.generator.entity.PatchInfo;
 import com.empire.patch.generator.entity.ProjectInfo;
 import com.empire.patch.generator.entity.SourceMapper;
@@ -48,6 +49,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -238,9 +240,10 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         globalConsolejTextPane = new javax.swing.JTextPane();
         globalConsoleClearjButton = new javax.swing.JButton();
         PROJECTADDRESSjLabel = new javax.swing.JLabel();
+        SOFTVERSIONjLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Empire全自动打包神器v3.2.0_Creat By Aaron【Q群456742016】");
+        setTitle("Empire全自动打包神器v3.5.0_Creat By Aaron【Q群456742016】");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setIconImage(Toolkit.getDefaultToolkit().getImage("favicon-20180430115456304.ico"));
         setLocation(new java.awt.Point(0, 0));
@@ -1015,7 +1018,11 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         PROJECTADDRESSjLabel.setText("gitee地址：https://gitee.com/hackempire/patch-generator-desk");
         PROJECTADDRESSjLabel.setAutoscrolls(true);
         PROJECTADDRESSjLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        getContentPane().add(PROJECTADDRESSjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 390, 470, 20));
+        getContentPane().add(PROJECTADDRESSjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 390, 300, 20));
+
+        SOFTVERSIONjLabel.setFont(new java.awt.Font("宋体", 1, 10)); // NOI18N
+        SOFTVERSIONjLabel.setForeground(new java.awt.Color(204, 102, 0));
+        getContentPane().add(SOFTVERSIONjLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 390, 130, 20));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -1553,6 +1560,11 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         String startVersion = GITSERVERVERSIONSTARTjTextField.getText();
         String endVersion = GITSERVERVERSIONENDjTextField.getText();
 
+        ProjectTypeEnum projectType = ProjectTypeEnum.SINGLEMODULE;
+        if (GITSERVERPROJECTMUTILjRadioButton.isSelected()) {
+            projectType = ProjectTypeEnum.MULTIMODULE;
+        }
+        
         List<SourceMapper> sourceMappers = new ArrayList<>();
         DefaultTableModel sourceMapperModel = (DefaultTableModel) GITSERVERSOURCEMAPPERjTable.getModel();
         int rowCount = sourceMapperModel.getRowCount();
@@ -1561,14 +1573,14 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
             String targetDir = sourceMapperModel.getValueAt(i, 1) != null ? sourceMapperModel.getValueAt(i, 1).toString() : "";
             String patchDir = sourceMapperModel.getValueAt(i, 2) != null ? sourceMapperModel.getValueAt(i, 2).toString() : "";
             if (StringUtils.isNotBlank(sourceDir) && StringUtils.isNotBlank(targetDir)) {
+                if(projectType.equals(ProjectTypeEnum.SINGLEMODULE)&&sourceDir.indexOf("/")==1){
+                    sourceDir=sourceDir.substring(1);
+                }
                 SourceMapper sourceMapper = new SourceMapper(sourceDir, targetDir, patchDir);
                 sourceMappers.add(sourceMapper);
             }
         }
-        ProjectTypeEnum projectType = ProjectTypeEnum.SINGLEMODULE;
-        if (GITSERVERPROJECTMUTILjRadioButton.isSelected()) {
-            projectType = ProjectTypeEnum.MULTIMODULE;
-        }
+       
         GitProjectInfo projectInfo = new GitProjectInfo();
         projectInfo.setProjectName(projectName);
         projectInfo.setProjectType(projectType);
@@ -2363,7 +2375,19 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                 String softVersion="";
+                try {
+                    String html=HttpUtil.get("https://gitee.com/hackempire/patch-generator-desk/attach_files");
+                    String softPre="patch-generator-desk-";
+                    int index=html.indexOf(softPre);
+                    if(index!=-1){
+                        softVersion=html.substring(index+softPre.length(),index+softPre.length()+6);
+                    }
+                } catch (Exception ex) {
+                    java.util.logging.Logger.getLogger(GeneratorMainJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 JFrame mainJFrame = new GeneratorMainJFrame();
+                (((GeneratorMainJFrame) mainJFrame).SOFTVERSIONjLabel).setText("最新版本："+softVersion);
                 MainFrameConsoleUtil.initConsole(((GeneratorMainJFrame) mainJFrame).CONSOLEtextArea, ((GeneratorMainJFrame) mainJFrame).globalConsolejTextPane);
                 Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
                 //设置软件图标
@@ -2516,6 +2540,7 @@ public class GeneratorMainJFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane MVNjScrollPane;
     private javax.swing.JLabel PROJECTADDRESSjLabel;
     private javax.swing.JTabbedPane PatchjTabbedPane;
+    private javax.swing.JLabel SOFTVERSIONjLabel;
     private javax.swing.JButton SVNLOGADDjButton;
     private javax.swing.JButton SVNLOGDELjButton;
     private javax.swing.JButton SVNLOGOUTPACKjButton;
